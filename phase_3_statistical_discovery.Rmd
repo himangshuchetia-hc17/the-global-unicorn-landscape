@@ -1,0 +1,253 @@
+---
+title: "Phase 3: Statistical Discovery & Advanced EDA (R)"
+author: "Himangshu Chetia"
+output: html_document
+date: "2026-01-04"
+---
+
+# Load the necessary libraries.
+
+```{r, message = FALSE}
+library(tidyverse)
+library(scales)
+library(knitr)
+```
+
+```{r, echo = FALSE}
+setwd(r"(/home/himu/MyRStudioProjects/The Global Unicorn Landscape)")
+```
+# Load the CSV file.
+
+*Note on Granularity: Company-level metrics are derived solely from the primary dataset (`dataset.csv`). The long-format dataset (`dataset_long.csv`) is reserved for investor analysis only, as using it for general statistics would skew valuation and funding totals due to record duplication across multiple investors.*
+
+```{r}
+data <- read_csv("dataset.csv")
+```
+
+# Identify the structure of the dataset.
+
+```{r}
+glimpse(data)
+```
+
+*With the `glipse()` functions we can see that all the columns are in the appropritate format.*
+
+# Calculating Time to Unicorn Status
+
+```{r}
+data <- data |> 
+    mutate(
+        years_to_unicorn = year(date_joined) - year(year_founded)
+    )
+```
+
+**Now lets look at the dataset again**
+
+```{r}
+glimpse(data)
+```
+
+The `years_to_unicorn` column has been successfully added to the dataset.
+
+# Distribution Analysis
+
+First calculate the `mean` and `median` values of the `years_to_unicorn` column.
+
+```{r}
+mean_val   <- mean(data$years_to_unicorn)
+median_val <- median(data$years_to_unicorn)
+```
+```{r}
+print(mean_val)
+print(median_val)
+```
+
+Visualise the distribution of `years_to_unicorn` using `ggplot2`.
+
+```{r, warning = FALSE}
+ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
+  geom_histogram(
+    fill = "grey70",
+    colour = "white",
+    bins = 50,
+    alpha = 0.8
+  ) +
+  geom_density(
+    colour = "#404080"
+  ) +
+  geom_vline(
+    xintercept = mean_val,
+    colour = "#D55E00",
+    linetype = "dashed"
+  ) +
+  geom_vline(
+    xintercept = median_val,
+    colour = "#0072B2",
+    linetype = "dashed"
+  ) +
+  annotate(
+    "text",
+    x = 12,
+    y = 0.1,
+    label = "Mean",
+    colour = "red",
+  ) +
+  annotate(
+    "text",
+    x = 2,
+    y = 0.1,
+    label = "Median",
+    colour = "blue"
+  ) +
+  labs(
+    title = "Distribution of Years to Reach Unicorn Status",
+    subtitle = "Analysis of ~1,000 Global Startups",
+    x = "Years to $1B valuation",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  xlim(0,50)
+```
+
+### Key Insights:
+* The distribution is Right-Skewed (Positive Skew).
+* Here the Meadian (6 years) is lower than the Mean (7 Years). This is beacuse a small number of companies took 20+ years to reach "Unicorn" status and pulled the average to the right.
+* A peak is noticable near 4-6 years. This is where the most successfull modern startups tend to hit their billion dollar valuation.
+
+# Correlation Testing
+
+First calculate the **Pearson correlation coefficient** between `funding` and `valuation`.
+
+```{r}
+pearson_val <- cor(
+  data$funding,
+  data$valuation,
+  use = "complete.obs",
+  method = "pearson"
+)
+```
+
+```{r}
+print(pearson_val)
+```
+
+Visualise the correlation between `valuation` and `funding`.
+
+```{r, message = FALSE}
+ggplot(data, aes(x = funding, y = valuation)) +
+  geom_point(
+    alpha = 0.8,
+    colour = "steelblue",
+    na.rm = TRUE
+  ) +
+  geom_smooth(
+    method = "lm",
+    na.rm = TRUE,
+    colour = "darkred"
+  ) +
+  scale_x_log10(
+    labels = label_number(scale_cut = cut_short_scale())
+  ) +
+  scale_y_log10(
+    labels = label_number(scale_cut = cut_short_scale())
+  ) +
+  labs(
+    title = "Correlation: Total Funding vs. Valuation",
+    x = "Total Funding (USD)",
+    y = "Current Valuation (USD)",
+    caption = "Note: Axes are on a Logarithmic scale for better visibility."
+  ) +
+  theme_minimal()
+```
+
+### Key Insights:
+* The red regression line shows a clear upward slope, confirming a positive correlation between funding and valuation. However, both the axes are on a logarithmic scale, equal steps on the chart represent multiplying not adding (i.e. moving from $100M to $1B is treated the same as moving from $10M to $100M). Therefore the red line means:
+
+> When funding increases by a large muliple, valuation also increases by a large multiple.
+
+* The vertical distance from the line shows capital efficiency. Above the line means creating more value per dollar; below the line means spending more to get the same result.
+
+* With a correlation of ~0.60, funding accounts for about 36% of the variation in valuation ($R^2 = 0.36$), meaning the remaining 64% is driven by other factors such as execution, timing, and competitive advantage.
+
+* There is a dense cluster of companies around the $1B valuation level, typically with $100M–$1B in total funding. This indicates that, in today’s market, reaching unicorn status usually requires capital within this range.
+
+# Industry Deep-Dive:
+
+Created a temporary dataset restricted to the "Artificial Intelligence" and "Fintech" industries to enable focused, side-by-side comparative analysis of valuation and funding characteristics.
+
+```{r}
+comparison_data <- data |> 
+    filter(industry %in% c("Artificial intelligence", "Fintech"))
+```
+
+### Create a summary statistics table:
+
+```{r}
+comparison_stats <- comparison_data |>
+  group_by(industry) |>
+  summarise(
+    Company_Count = n(),
+    Avg_Years_to_Unicorn = mean(years_to_unicorn, na.rm = TRUE),
+    Median_Years_to_Unicorn = median(years_to_unicorn, na.rm = TRUE),
+    Avg_Funding_USD = mean(funding, na.rm = TRUE),
+    Median_Funding_USD = median(funding, na.rm = TRUE),
+  )
+```
+
+View the summary table:
+
+```{r}
+kable(
+    comparison_stats,
+    caption = "Statistical Profile: AI vs. Fintech"
+)
+```
+
+### Visualisation: Comparing the growth rate
+
+```{r}
+ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)) +
+  geom_boxplot(alpha = 0.8) +
+  labs(title = "Distribution of Growth Velocity", 
+       subtitle = "Years from Founding to $1B Valuation",
+       y = "Years", x = "Industries") +
+  theme_minimal() +
+  scale_fill_manual(values = c("blue", "yellow"))
+```
+
+* AI companies reach unicorn status in fewer years on average than Fintech companies.
+
+* AI has a tighter interquartile range, meaning outcomes are more clustered. However, Fintech shows a wider spread, indicating greater variability in growth timelines.
+
+* Fintech has many extreme outliers, with some companies taking 20+ years to reach unicorn status. However, AI has fewer extreme slow-growth cases.
+
+### Visualisation: Funding Requirements (Mean Funding)
+
+```{r}
+ggplot(comparison_stats,
+       aes(x = industry, y = Avg_Funding_USD, fill = industry)) +
+  geom_col() +
+  scale_y_continuous(
+    labels = label_number(scale_cut = cut_short_scale())
+  ) +
+  labs(
+    title = "Average Capital Requirement",
+    y = "Average Funding Raised (USD)",
+    x = "Industries"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("blue", "yellow"))
+
+```
+
+* AI unicorns raise roughly $500M+ on average and Fintech unicorns raise closer to $450M. This indicates that, while AI companies may reach unicorn status faster (as shown earlier), they tend to do so with higher upfront capital requirements.
+* Fintech is comparatively more capital-efficient at the point of reaching $1B valuation, despite longer and more variable growth timelines.
+
+### Key Insights:
+AI investing favors larger checks with faster scaling, while Fintech offers lower average capital requirements but longer, less predictable paths to unicorn status.
+
+# Closing Statement
+
+This analysis provides a data-driven perspective on the structural realities of startup growth and capital formation. By examining both the distribution of time required to achieve unicorn status and the variation in average funding across industries, the findings highlight meaningful heterogeneity in growth trajectories and capital intensity. The results suggest that success timelines are not uniform and are strongly influenced by sector-specific dynamics, reinforcing the importance of contextual benchmarks when evaluating startup performance.
+
+While the analysis offers valuable descriptive insights, it is limited by the scope and granularity of the available data. Future work could extend this approach by incorporating longitudinal funding rounds, geographic controls, or macroeconomic conditions to better isolate causal relationships. Overall, this phase establishes a solid empirical foundation for deeper inferential or predictive modeling in subsequent stages of the project.
