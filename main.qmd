@@ -1,11 +1,140 @@
 ---
-title: "Phase 3: Statistical Discovery & Advanced EDA (R)"
+title: "Statistical Case Study: From Data Cleaning to Analysis"
 author: "Himangshu Chetia"
 output: html_document
-date: "2026-01-04"
+date: "2026-01-16"
 ---
 
-# Load the necessary libraries.
+
+
+
+# Phase 0: Project Planning & Problem Definition
+
+*Goal: Align the technical work with the business objectives.*
+
+* **Stakeholder Identification:** General Partners at a mid-sized VC firm looking to deploy $500M in emerging markets
+
+* **Problem Statement:** Silicon Valley is saturated and expensive. How can we find untapped geographical hubs that produce high-value, capital-efficient startups in under 5 years?
+
+* **KPIs:**
+    * *Speed to Unicorn:* Years from foundation to $1B+
+    * *Capital Efficiency Ratio:* Valuation $\div$ Total Funding.
+    * *Market Saturation:* Density of unicorns per city/industry.
+
+* **Data Dictionary:** Setting `Industry` and `Location` as primary filters, `Valuation` as the success metric.
+
+# Phase 1: Data Engineering & Pre-processing (Excel/R)
+
+*Goal: Perform heavy-duty aggregation and multi-dimensional filtering.*
+
+* **Currency Normalization:** Used the following Excel formula to convert shorthand ($8B, $200M) into long-form integers:
+
+    `IF(RIGHT(B2,1)="B", SUBSTITUTE(SUBSTITUTE(B2,"$",""),"B","")*1000000000, IF(RIGHT(B2,1)="M", SUBSTITUTE(SUBSTITUTE(B2,"$",""),"M","")*1000000, SUBSTITUTE(B2,"$","")*1))`
+
+* **Date Standardization:** Converted all dates into the `YYYY-MM-DD` format
+
+* **Data Integrity Check:**
+
+    * Identified and fixed outliers in the date columns where `Year Founded` > `Date Joined` using the `DATEDIF` function.
+
+    * Imputed missing values (like the Singapore,Hong Kong and Bahamas city gap).
+
+* **Data Transformation (Wide to Long):** Created another dataset containing only company and investor columns by converting the wide data into long format using the following R script:
+
+```r
+# Load the necessary libraries
+library(tidyverse)
+library(readr)
+
+# Read the data
+df <- read_csv("dataset_long_temp.csv")
+
+# Convert from wide to long
+df_long <- df %>%
+separate_rows(investors, sep = ",") %>%
+mutate(investors = str_trim(investors))
+
+# View result
+view(df_long)
+
+# Save the file
+readr::write_csv(df_long, "dataset_long.csv")
+```
+
+* **Final Export:** Generated two cleaned `.csv` files to be used in all subsequent tools.
+
+# Phase 2: Database Management & SQL Analysis
+
+*Goal: Establish the baseline metrics.*
+
+* **Schema Design:** Imported the cleaned data into MySQL with appropriate data types.
+
+* **The "Efficiency" Query:** Performed the following SQL query to filter the companies that reached Unicorn status within 5 years:
+```sql
+SELECT company, years_to_unicorn
+FROM (
+	SELECT
+        company,
+        YEAR(date_joined) - YEAR(year_founded) AS years_to_unicorn
+	FROM dataset
+	GROUP BY company, years_to_unicorn
+    ) AS yu
+WHERE years_to_unicorn <= 5
+ORDER BY years_to_unicorn;
+```
+
+* **Geographic Grouping:** Performed the following query to find the `Average Valuation` per startup per country:
+```sql
+SELECT
+	country,
+    avg(valuation) AS average_valuation
+FROM dataset
+GROUP BY country
+ORDER BY average_valuation DESC;
+```
+
+* **Investor Counting:** Wrote the following query to identify which specific investors appear most frequently in the "Top 10%" of the most efficient startups:
+
+```sql
+WITH enriched AS (
+    SELECT
+        company,
+        investors,
+        YEAR(date_joined) - YEAR(year_founded) AS years_to_unicorn
+    FROM dataset_long
+    WHERE YEAR(date_joined) - YEAR(year_founded) <= 5
+),
+ranked AS (
+    SELECT
+        company,
+        investors,
+        years_to_unicorn,
+        NTILE(10) OVER (ORDER BY years_to_unicorn) AS decile
+    FROM enriched
+)
+
+SELECT
+    investors,
+    COUNT(*) AS companies_invested
+FROM ranked
+WHERE decile = 1
+GROUP BY investors
+ORDER BY companies_invested DESC;
+```
+
+* **Top valued industries:** Identified industries with the highest company valuations.
+
+```sql
+SELECT
+    industry,
+    SUM(valuation) AS total_valuation
+FROM dataset
+GROUP BY industry;
+```
+
+# Phase 3: Statistical Discovery & Advanced EDA (R)
+
+## Load the necessary libraries.
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -14,9 +143,9 @@ library(knitr)
 ```
 
 ```{r, echo = FALSE}
-setwd(r"(/home/himu/MyRStudioProjects/The Global Unicorn Landscape)")
+setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 ```
-# Load the CSV file.
+## Load the CSV file.
 
 *Note on Granularity: Company-level metrics are derived solely from the primary dataset (`dataset.csv`). The long-format dataset (`dataset_long.csv`) is reserved for investor analysis only, as using it for general statistics would skew valuation and funding totals due to record duplication across multiple investors.*
 
@@ -24,7 +153,7 @@ setwd(r"(/home/himu/MyRStudioProjects/The Global Unicorn Landscape)")
 data <- read_csv("dataset.csv")
 ```
 
-# Identify the structure of the dataset.
+## Identify the structure of the dataset.
 
 ```{r}
 glimpse(data)
@@ -32,7 +161,7 @@ glimpse(data)
 
 *With the `glipse()` functions we can see that all the columns are in the appropritate format.*
 
-# Calculating Time to Unicorn Status
+## Calculating Time to Unicorn Status
 
 ```{r}
 data <- data |> 
@@ -49,7 +178,7 @@ glimpse(data)
 
 The `years_to_unicorn` column has been successfully added to the dataset.
 
-# Distribution Analysis
+## Distribution Analysis
 
 First calculate the `mean` and `median` values of the `years_to_unicorn` column.
 
@@ -109,12 +238,12 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
   xlim(0,50)
 ```
 
-### Key Insights:
+#### Key Insights:
 * The distribution is Right-Skewed (Positive Skew).
 * Here the Meadian (6 years) is lower than the Mean (7 Years). This is beacuse a small number of companies took 20+ years to reach "Unicorn" status and pulled the average to the right.
 * A peak is noticable near 4-6 years. This is where the most successfull modern startups tend to hit their billion dollar valuation.
 
-# Correlation Testing
+## Correlation Testing
 
 First calculate the **Pearson correlation coefficient** between `funding` and `valuation`.
 
@@ -160,7 +289,7 @@ ggplot(data, aes(x = funding, y = valuation)) +
   theme_minimal()
 ```
 
-### Key Insights:
+#### Key Insights:
 * The red regression line shows a clear upward slope, confirming a positive correlation between funding and valuation. However, both the axes are on a logarithmic scale, equal steps on the chart represent multiplying not adding (i.e. moving from $100M to $1B is treated the same as moving from $10M to $100M). Therefore the red line means:
 
 > When funding increases by a large muliple, valuation also increases by a large multiple.
@@ -171,7 +300,7 @@ ggplot(data, aes(x = funding, y = valuation)) +
 
 * There is a dense cluster of companies around the $1B valuation level, typically with $100M–$1B in total funding. This indicates that, in today’s market, reaching unicorn status usually requires capital within this range.
 
-# Industry Deep-Dive:
+## Industry Deep-Dive:
 
 Created a temporary dataset restricted to the "Artificial Intelligence" and "Fintech" industries to enable focused, side-by-side comparative analysis of valuation and funding characteristics.
 
@@ -180,7 +309,7 @@ comparison_data <- data |>
     filter(industry %in% c("Artificial intelligence", "Fintech"))
 ```
 
-### Create a summary statistics table:
+#### Create a summary statistics table:
 
 ```{r}
 comparison_stats <- comparison_data |>
@@ -203,7 +332,7 @@ kable(
 )
 ```
 
-### Visualisation: Comparing the growth rate
+#### Visualisation: Comparing the growth rate
 
 ```{r}
 ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)) +
@@ -221,7 +350,7 @@ ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)
 
 * Fintech has many extreme outliers, with some companies taking 20+ years to reach unicorn status. However, AI has fewer extreme slow-growth cases.
 
-### Visualisation: Funding Requirements (Mean Funding)
+#### Visualisation: Funding Requirements (Mean Funding)
 
 ```{r}
 ggplot(comparison_stats,
@@ -243,11 +372,14 @@ ggplot(comparison_stats,
 * AI unicorns raise roughly $500M+ on average and Fintech unicorns raise closer to $450M. This indicates that, while AI companies may reach unicorn status faster (as shown earlier), they tend to do so with higher upfront capital requirements.
 * Fintech is comparatively more capital-efficient at the point of reaching $1B valuation, despite longer and more variable growth timelines.
 
-### Key Insights:
+#### Key Insights:
 AI investing favors larger checks with faster scaling, while Fintech offers lower average capital requirements but longer, less predictable paths to unicorn status.
 
-# Closing Statement
+## Closing Statement
 
 This analysis provides a data-driven perspective on the structural realities of startup growth and capital formation. By examining both the distribution of time required to achieve unicorn status and the variation in average funding across industries, the findings highlight meaningful heterogeneity in growth trajectories and capital intensity. The results suggest that success timelines are not uniform and are strongly influenced by sector-specific dynamics, reinforcing the importance of contextual benchmarks when evaluating startup performance.
 
 While the analysis offers valuable descriptive insights, it is limited by the scope and granularity of the available data. Future work could extend this approach by incorporating longitudinal funding rounds, geographic controls, or macroeconomic conditions to better isolate causal relationships. Overall, this phase establishes a solid empirical foundation for deeper inferential or predictive modeling in subsequent stages of the project.
+
+# Phase 4: Visual Storytelling & BI (Tableau)
+
