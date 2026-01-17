@@ -7,7 +7,6 @@ date: "2026-01-16"
 
 
 
-
 # Phase 0: Project Planning & Problem Definition
 
 *Goal: Align the technical work with the business objectives.*
@@ -382,4 +381,3 @@ This analysis provides a data-driven perspective on the structural realities of 
 While the analysis offers valuable descriptive insights, it is limited by the scope and granularity of the available data. Future work could extend this approach by incorporating longitudinal funding rounds, geographic controls, or macroeconomic conditions to better isolate causal relationships. Overall, this phase establishes a solid empirical foundation for deeper inferential or predictive modeling in subsequent stages of the project.
 
 # Phase 4: Visual Storytelling & BI (Tableau)
-
