@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Himangshu Chetia">
+<meta name="dcterms.date" content="2024-06-10">
 
-<title>readme</title>
+<title>Chasing Billions: The Global Unicorn Landscape</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -35,6 +37,35 @@ ul.task-list li input[type="checkbox"] {
 <link href="readme_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="readme_files/libs/bootstrap/bootstrap-41b93f9265609a265e3804f63820d670.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -44,21 +75,39 @@ ul.task-list li input[type="checkbox"] {
 
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Chasing Billions: The Global Unicorn Landscape</h1>
+</div>
 
 
 
-<section id="chasing-billions-the-global-unicorn-landscape" class="level1">
-<h1>Chasing Billions: The Global Unicorn Landscape</h1>
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Himangshu Chetia </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">June 10, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
 <section id="strategic-analysis-of-1b-private-startups" class="level3">
 <h3 class="anchored" data-anchor-id="strategic-analysis-of-1b-private-startups">Strategic Analysis of $1B+ Private Startups</h3>
-</section>
-<section id="executive-summary-the-tldr" class="level2">
-<h2 class="anchored" data-anchor-id="executive-summary-the-tldr">Executive Summary (The “TL;DR”)</h2>
-<ul>
-<li><strong>The Trend:</strong> [Insert your top finding here, e.g., “Fintech in Southeast Asia is scaling 20% faster than in Europe.”]</li>
-<li><strong>The Opportunity:</strong> Identified 3 underserved cities where “Capital Efficiency” is higher than Silicon Valley.</li>
-<li><strong>The Action:</strong> Recommended a diversification strategy into [Industry] within [Region].</li>
-</ul>
 </section>
 <section id="the-business-problem" class="level2">
 <h2 class="anchored" data-anchor-id="the-business-problem">The Business Problem</h2>
@@ -76,9 +125,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="key-performance-indicators-kpis" class="level2">
 <h2 class="anchored" data-anchor-id="key-performance-indicators-kpis">Key Performance Indicators (KPIs)</h2>
 <ol type="1">
-<li><strong>Speed to Unicorn:</strong> Years from founding to $1B valuation.</li>
-<li><strong>Capital Efficiency:</strong> Valuation ÷ Total Funding Raised.</li>
-<li><strong>Investor Saturation:</strong> Number of top-tier investors already present in a city/industry.</li>
+<li><strong>Speed to Unicorn:</strong> Years from foundation to $1B+</li>
+<li><strong>Capital Efficiency Ratio:</strong> Valuation <span class="math inline">\(\div\)</span> Total Funding.</li>
+<li><strong>Elite Investors:</strong> Investors with stakes in the top 10% most efficient startups.</li>
+<li><strong>Market Saturation:</strong> Density of unicorns per city/industry.</li>
 </ol>
 </section>
 <section id="data-integrity-cleaning" class="level2">
@@ -107,6 +157,13 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Citation:</strong> Shamim, A. (2024). Startup growth and investment data [Data set]. Kaggle. https://www.kaggle.com/datasets/adilshamim8/startup-growth-and-investment-data</li>
 </ul>
 </section>
+<section id="executive-summary-the-tldr" class="level2">
+<h2 class="anchored" data-anchor-id="executive-summary-the-tldr">Executive Summary (The “TL;DR”)</h2>
+<ul>
+<li><strong>The Trend:</strong> [Insert your top finding here, e.g., “Fintech in Southeast Asia is scaling 20% faster than in Europe.”]</li>
+<li><strong>The Opportunity:</strong> Identified 3 underserved cities where “Capital Efficiency” is higher than Silicon Valley.</li>
+<li><strong>The Action:</strong> Recommended a diversification strategy into [Industry] within [Region].</li>
+</ul>
 </section>
 
 </main>

@@ -18,6 +18,7 @@ date: "2026-01-16"
 * **KPIs:**
     * *Speed to Unicorn:* Years from foundation to $1B+
     * *Capital Efficiency Ratio:* Valuation $\div$ Total Funding.
+    * *Elite Investors:* Investors with stakes in the top 10% most efficient startups.
     * *Market Saturation:* Density of unicorns per city/industry.
 
 * **Data Dictionary:** Setting `Industry` and `Location` as primary filters, `Valuation` as the success metric.

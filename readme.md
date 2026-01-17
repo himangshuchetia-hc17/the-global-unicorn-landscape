@@ -1,10 +1,11 @@
-# Chasing Billions: The Global Unicorn Landscape
-### Strategic Analysis of $1B+ Private Startups
+---
+title: "Chasing Billions: The Global Unicorn Landscape"
+author: "Himangshu Chetia"
+date: "2024-06-10"
+output: html_document
+---
 
-## Executive Summary (The "TL;DR")
-* **The Trend:** [Insert your top finding here, e.g., "Fintech in Southeast Asia is scaling 20% faster than in Europe."]
-* **The Opportunity:** Identified 3 underserved cities where "Capital Efficiency" is higher than Silicon Valley.
-* **The Action:** Recommended a diversification strategy into [Industry] within [Region].
+### Strategic Analysis of $1B+ Private Startups
 
 ## The Business Problem
 A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B in <5 years) outside Silicon Valley to find underserved, high-growth markets.
@@ -16,9 +17,10 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 * **Tableau:** [Link to Dashboard] Interactive visualization of investor networks.
 
 ## Key Performance Indicators (KPIs)
-1. **Speed to Unicorn:** Years from founding to $1B valuation.
-2. **Capital Efficiency:** Valuation ÷ Total Funding Raised.
-3. **Investor Saturation:** Number of top-tier investors already present in a city/industry.
+1. **Speed to Unicorn:** Years from foundation to $1B+
+2. **Capital Efficiency Ratio:** Valuation $\div$ Total Funding.
+3. **Elite Investors:** Investors with stakes in the top 10% most efficient startups.
+4. **Market Saturation:** Density of unicorns per city/industry.
 
 ## Data Integrity & Cleaning
 * **Currency Normalization:** Converted mixed-string funding `($B/$M)` into integers for calculation.
@@ -36,3 +38,8 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 * **Author:** Adil Shamim
 * **Description:** This dataset provides a comprehensive list of "Unicorn" companies (private companies valued at over $1 billion). It includes key metrics such as current valuation, total funding raised, industry sector, headquarters location (City, Country, Continent), the year the company was founded, and the names of primary investors.
 * **Citation:** Shamim, A. (2024). Startup growth and investment data [Data set]. Kaggle. https://www.kaggle.com/datasets/adilshamim8/startup-growth-and-investment-data
+
+## Executive Summary (The "TL;DR")
+* **The Trend:** [Insert your top finding here, e.g., "Fintech in Southeast Asia is scaling 20% faster than in Europe."]
+* **The Opportunity:** Identified 3 underserved cities where "Capital Efficiency" is higher than Silicon Valley.
+* **The Action:** Recommended a diversification strategy into [Industry] within [Region].
