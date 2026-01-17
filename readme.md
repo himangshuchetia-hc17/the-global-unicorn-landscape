@@ -1,9 +1,4 @@
----
-title: "Chasing Billions: The Global Unicorn Landscape"
-author: "Himangshu Chetia"
-date: "2026-01-17"
-output: html_document
----
+# Chasing Billions: The Global Unicorn Landscape
 
 ### Strategic Analysis of $1B+ Private Startups
 
