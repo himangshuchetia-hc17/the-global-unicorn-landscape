@@ -170,6 +170,7 @@ dollar_format_big <- function(x) {
 ```{r, echo = FALSE}
 setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 ```
+
 ## Load the CSV file.
 
 *Note on Granularity: Company-level metrics are derived solely from the primary dataset (`dataset.csv`). The long-format dataset (`dataset_long.csv`) is reserved for investor analysis only, as using it for general statistics would skew valuation and funding totals due to record duplication across multiple investors.*
@@ -184,8 +185,6 @@ data <- read_csv("dataset.csv")
 glimpse(data)
 ```
 
-*With the `glipse()` functions we can see that all the columns are in the appropritate format.*
-
 ## Calculating Time to Unicorn Status
 
 ```{r}
@@ -195,8 +194,6 @@ data <- data %>%
     )
 ```
 
-**Now lets look at the dataset again**
-
 ```{r}
 glimpse(data)
 ```
@@ -205,7 +202,7 @@ The `years_to_unicorn` column has been successfully added to the dataset.
 
 ## Distribution Analysis
 
-First calculate the `mean` and `median` values of the `years_to_unicorn` column.
+Calculating `mean` and `median` of `years_to_unicorn`.
 
 ```{r}
 mean_val   <- mean(data$years_to_unicorn)
@@ -216,7 +213,7 @@ print(mean_val)
 print(median_val)
 ```
 
-Visualise the distribution of `years_to_unicorn`.
+Distribution of `years_to_unicorn`.
 
 ```{r, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
@@ -255,7 +252,7 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
   ) +
   labs(
     title = "Distribution of Years to Reach Unicorn Status",
-    subtitle = paste0("Analysis of ~1,000 Global Startups. Mean: ", round(mean_val, 2), ", Median: ", round(median_val, 2)),
+    subtitle = paste0("Mean: ", round(mean_val, 2), ", Median: ", round(median_val, 2)),
     x = "Years to $1B valuation",
     y = "Density"
   ) +
@@ -263,19 +260,19 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
   xlim(0,50)
 ```
 
-## Correlation Testing
+## Correlation Testing: `Valuation` & `Funding`
 
-First calculate the **Pearson and Spearman correlation coefficients** between `funding` and `valuation`.
+### **Pearson** and **Spearman** correlation coefficients
 
 ```{r}
-pearson_val <- cor(
+cor(
   data$funding,
   data$valuation,
   use = "complete.obs",
   method = "pearson"
 )
 
-spearman_val <- cor(
+cor(
   data$funding,
   data$valuation,
   use = "complete.obs",
@@ -283,12 +280,7 @@ spearman_val <- cor(
 )
 ```
 
-```{r}
-print(paste("Pearson correlation: ", pearson_val))
-print(paste("Spearman correlation: ", spearman_val))
-```
-
-Visualising the correlation between `valuation` and `funding`.
+### Scatterplot
 
 ```{r, message = FALSE}
 ggplot(data, aes(x = funding, y = valuation, color = industry)) +
@@ -317,16 +309,16 @@ ggplot(data, aes(x = funding, y = valuation, color = industry)) +
   theme_minimal()
 ```
 
-## Industry Deep-Dive:
+## Industry Deep-Dive: `AI` vs `Fintech`
 
-Created a temporary dataset restricted to the "Artificial Intelligence" and "Fintech" industries to enable focused, side-by-side comparative analysis of valuation and funding characteristics.
+### Temporary dataset restricted to just the two industries
 
 ```{r}
 comparison_data <- data %>%
     filter(industry %in% c("Artificial intelligence", "Fintech"))
 ```
 
-#### Create a summary statistics table:
+### Summary statistics table
 
 ```{r}
 comparison_stats <- comparison_data %>%
@@ -338,18 +330,14 @@ comparison_stats <- comparison_data %>%
     Avg_Funding_USD = mean(funding, na.rm = TRUE),
     Median_Funding_USD = median(funding, na.rm = TRUE),
   )
-```
 
-View the summary table:
-
-```{r}
 kable(
     comparison_stats,
     caption = "Statistical Profile: AI vs. Fintech"
 )
 ```
 
-#### Visualisation: Comparing the growth rate
+### Comparing growth rate
 
 ```{r}
 ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)) +
@@ -362,13 +350,16 @@ ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)
   scale_fill_viridis(discrete = TRUE)
 ```
 
-#### Visualisation: Funding Requirements (Mean Funding)
+### Funding Requirements (Mean Funding)
 
 ```{r}
 ggplot(comparison_stats,
        aes(x = industry, y = Avg_Funding_USD, fill = industry)) +
   geom_col() +
-  geom_errorbar(aes(ymin = Avg_Funding_USD - Median_Funding_USD, ymax = Avg_Funding_USD + Median_Funding_USD), width = 0.2) +
+  geom_errorbar(
+    aes(ymin = Avg_Funding_USD - Median_Funding_USD,
+    ymax = Avg_Funding_USD + Median_Funding_USD),
+    width = 0.2) +
   scale_y_continuous(
     labels = label_number(scale_cut = cut_short_scale())
   ) +
@@ -382,9 +373,9 @@ ggplot(comparison_stats,
 
 ```
 
-# Geographic Analysis
+## Geographic Analysis
 
-## Unicorn World Map
+### Unicorn World Map
 ```{r}
 geocoded_file <- "geocoded_unicorns.csv"
 if (file.exists(geocoded_file)) {
@@ -406,7 +397,6 @@ ggplot() +
   scale_color_viridis(discrete = TRUE) +
   labs(
     title = "Global Distribution of Unicorn Companies",
-    subtitle = "Point size represents valuation",
     x = "",
     y = "",
     color = "Continent"
@@ -415,7 +405,7 @@ ggplot() +
   theme(legend.position = "bottom")
 ```
 
-## Top 10 Unicorn Countries
+### Top 10 Unicorn Countries
 ```{r}
 data %>%
   group_by(country) %>%
@@ -434,7 +424,7 @@ data %>%
   theme_minimal()
 ```
 
-## Top 10 Unicorn Cities
+### Top 10 Unicorn Cities
 ```{r}
 data %>%
   group_by(city) %>%
@@ -453,9 +443,9 @@ data %>%
   theme_minimal()
 ```
 
-# Industry and Valuation Analysis
+## Industry and Valuation Analysis
 
-## Unicorns by Industry
+### Unicorns by Industry
 ```{r}
 data %>%
   group_by(industry) %>%
@@ -473,7 +463,7 @@ data %>%
   theme_minimal()
 ```
 
-## Total Valuation by Industry
+### Total Valuation by Industry
 ```{r}
 data %>%
   group_by(industry) %>%
@@ -492,9 +482,9 @@ data %>%
   theme_minimal()
 ```
 
-# Time-based Analysis
+## Time-based Analysis
 
-## Unicorns Founded Per Year
+### Unicorns Founded Per Year
 ```{r}
 data %>%
   mutate(year = year(year_founded)) %>%
@@ -510,7 +500,7 @@ data %>%
   theme_minimal()
 ```
 
-## Unicorns Joined Per Year
+## #Unicorns Joined Per Year
 ```{r}
 data %>%
   mutate(year = year(date_joined)) %>%
@@ -526,7 +516,7 @@ data %>%
   theme_minimal()
 ```
 
-## Valuation vs. Years to Unicorn
+### Valuation vs. Years to Unicorn
 ```{r}
 ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   geom_point(alpha = 0.8) +
@@ -540,7 +530,7 @@ ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   theme_minimal()
 ```
 
-# Key Findings
+## Key Findings
 * The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.
 * There is a positive correlation between funding and valuation, with a Pearson correlation coefficient of ~0.60 and a Spearman correlation coefficient of ~0.59. Funding accounts for about 36% of the variation in valuation.
 * AI companies tend to reach unicorn status faster but require more funding than Fintech companies.
