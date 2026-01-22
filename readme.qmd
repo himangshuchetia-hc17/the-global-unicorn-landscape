@@ -20,13 +20,13 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 3. **Elite Investors:** Investors with stakes in the top 10% most efficient startups.
 4. **Market Saturation:** Density of unicorns per city/industry.
 
-## Data Integrity and Cleaning
+## Data Integrity & Cleaning
 * **Currency Normalization:** Converted mixed-string funding `($B/$M)` into integers for calculation.
 * **Investor Parsing:** Created a "long" version of the data (where one company has multiple rows, one for each investor) using R & the `tidyverse()` package.
 * **Spatial Correction:** Imputed missing city data for Singapore, Hong Kong and Bahamas entities.
 * **Outlier Handling:** Addressed data entry errors (e.g., founded dates listed after join dates).
 
-## Limitations and Assumptions
+## Limitations & Assumptions
 * **Survival Bias:** Data excludes companies that have already exited via IPO or Acquisition.
 * **Founding Date Assumption:** Companies are assumed to be founded on Jan 1st of their founding year for time-series calculations.
 
@@ -37,7 +37,7 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 * **Description:** This dataset provides a comprehensive list of "Unicorn" companies (private companies valued at over $1 billion). It includes key metrics such as current valuation, total funding raised, industry sector, headquarters location (City, Country, Continent), the year the company was founded, and the names of primary investors.
 * **Citation:** Shamim, A. (2024). Startup growth and investment data [Data set]. Kaggle. https://www.kaggle.com/datasets/adilshamim8/startup-growth-and-investment-data
 
-## Phase 1: Data Engineering & Pre-processing (Excel/R)
+# Phase 1: Data Engineering & Pre-processing (Excel/R)
 
 *Goal: Perform heavy-duty aggregation and multi-dimensional filtering.*
 
@@ -58,7 +58,6 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 ```r
 # Load the necessary libraries
 library(tidyverse)
-(readr)
 
 # Read the data
 df <- read_csv("dataset_long_temp.csv")
@@ -77,7 +76,7 @@ readr::write_csv(df_long, "dataset_long.csv")
 
 * **Final Export:** Generated two cleaned `.csv` files to be used in all subsequent tools.
 
-## Phase 2: Database Management & SQL Analysis
+# Phase 2: Database Management & SQL Analysis
 
 *Goal: Establish the baseline metrics.*
 
@@ -146,9 +145,9 @@ FROM dataset
 GROUP BY industry;
 ```
 
-## Phase 3: Statistical Discovery & Advanced EDA (R)
+# Phase 3: Statistical Discovery & Advanced EDA (R)
 
-### Load the Necessary Libraries
+## Load the necessary libraries.
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -159,7 +158,7 @@ library(maps)
 library(tidygeocoder)
 ```
 
-### Custom Formatting Function for Large Numbers
+## Custom formatting function for large numbers
 ```{r}
 dollar_format_big <- function(x) {
   ifelse(x >= 1e9, paste0(x / 1e9, "B"),
@@ -171,7 +170,7 @@ dollar_format_big <- function(x) {
 ```{r, echo = FALSE}
 setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 ```
-### Load the CSV File
+## Load the CSV file.
 
 *Note on Granularity: Company-level metrics are derived solely from the primary dataset (`dataset.csv`). The long-format dataset (`dataset_long.csv`) is reserved for investor analysis only, as using it for general statistics would skew valuation and funding totals due to record duplication across multiple investors.*
 
@@ -179,7 +178,7 @@ setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 data <- read_csv("dataset.csv")
 ```
 
-### Identify the Structure of the Dataset
+## Identify the structure of the dataset.
 
 ```{r}
 glimpse(data)
@@ -187,16 +186,16 @@ glimpse(data)
 
 *With the `glipse()` functions we can see that all the columns are in the appropritate format.*
 
-### Calculating Time to Unicorn Status
+## Calculating Time to Unicorn Status
 
 ```{r}
-data <- data |> 
+data <- data %>% 
     mutate(
         years_to_unicorn = year(date_joined) - year(year_founded)
     )
 ```
 
-#### Now Let's Look at the Dataset Again
+**Now lets look at the dataset again**
 
 ```{r}
 glimpse(data)
@@ -204,7 +203,7 @@ glimpse(data)
 
 The `years_to_unicorn` column has been successfully added to the dataset.
 
-### Distribution Analysis
+## Distribution Analysis
 
 First calculate the `mean` and `median` values of the `years_to_unicorn` column.
 
@@ -217,7 +216,7 @@ print(mean_val)
 print(median_val)
 ```
 
-Visualise the distribution of `years_to_unicorn` using `ggplot2`.
+Visualise the distribution of `years_to_unicorn`.
 
 ```{r, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
@@ -240,6 +239,20 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
     colour = "#0072B2",
     linetype = "dashed"
   ) +
+    annotate(
+    "text",
+    x = 12,
+    y = 0.1,
+    label = "Mean",
+    colour = "red",
+  ) +
+  annotate(
+    "text",
+    x = 2,
+    y = 0.1,
+    label = "Median",
+    colour = "blue"
+  ) +
   labs(
     title = "Distribution of Years to Reach Unicorn Status",
     subtitle = paste0("Analysis of ~1,000 Global Startups. Mean: ", round(mean_val, 2), ", Median: ", round(median_val, 2)),
@@ -250,7 +263,7 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
   xlim(0,50)
 ```
 
-### Correlation Testing
+## Correlation Testing
 
 First calculate the **Pearson and Spearman correlation coefficients** between `funding` and `valuation`.
 
@@ -275,7 +288,7 @@ print(paste("Pearson correlation: ", pearson_val))
 print(paste("Spearman correlation: ", spearman_val))
 ```
 
-Visualise the correlation between `valuation` and `funding`.
+Visualising the correlation between `valuation` and `funding`.
 
 ```{r, message = FALSE}
 ggplot(data, aes(x = funding, y = valuation, color = industry)) +
@@ -304,20 +317,20 @@ ggplot(data, aes(x = funding, y = valuation, color = industry)) +
   theme_minimal()
 ```
 
-### Industry Deep-Dive
+## Industry Deep-Dive:
 
 Created a temporary dataset restricted to the "Artificial Intelligence" and "Fintech" industries to enable focused, side-by-side comparative analysis of valuation and funding characteristics.
 
 ```{r}
-comparison_data <- data |> 
+comparison_data <- data %>%
     filter(industry %in% c("Artificial intelligence", "Fintech"))
 ```
 
-#### Create a Summary Statistics Table
+#### Create a summary statistics table:
 
 ```{r}
-comparison_stats <- comparison_data |>
-  group_by(industry) |>
+comparison_stats <- comparison_data %>%
+  group_by(industry) %>%
   summarise(
     Company_Count = n(),
     Avg_Years_to_Unicorn = mean(years_to_unicorn, na.rm = TRUE),
@@ -336,7 +349,7 @@ kable(
 )
 ```
 
-#### Visualisation: Comparing the Growth Rate
+#### Visualisation: Comparing the growth rate
 
 ```{r}
 ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)) +
@@ -369,9 +382,9 @@ ggplot(comparison_stats,
 
 ```
 
-## Geographic Analysis
+# Geographic Analysis
 
-### Unicorn World Map
+## Unicorn World Map
 ```{r}
 geocoded_file <- "geocoded_unicorns.csv"
 if (file.exists(geocoded_file)) {
@@ -402,7 +415,7 @@ ggplot() +
   theme(legend.position = "bottom")
 ```
 
-### Top 10 Unicorn Countries
+## Top 10 Unicorn Countries
 ```{r}
 data %>%
   group_by(country) %>%
@@ -421,7 +434,7 @@ data %>%
   theme_minimal()
 ```
 
-### Top 10 Unicorn Cities
+## Top 10 Unicorn Cities
 ```{r}
 data %>%
   group_by(city) %>%
@@ -440,9 +453,9 @@ data %>%
   theme_minimal()
 ```
 
-## Industry and Valuation Analysis
+# Industry and Valuation Analysis
 
-### Unicorns by Industry
+## Unicorns by Industry
 ```{r}
 data %>%
   group_by(industry) %>%
@@ -460,7 +473,7 @@ data %>%
   theme_minimal()
 ```
 
-### Total Valuation by Industry
+## Total Valuation by Industry
 ```{r}
 data %>%
   group_by(industry) %>%
@@ -479,9 +492,9 @@ data %>%
   theme_minimal()
 ```
 
-## Time-based Analysis
+# Time-based Analysis
 
-### Unicorns Founded Per Year
+## Unicorns Founded Per Year
 ```{r}
 data %>%
   mutate(year = year(year_founded)) %>%
@@ -497,7 +510,7 @@ data %>%
   theme_minimal()
 ```
 
-### Unicorns Joined Per Year
+## Unicorns Joined Per Year
 ```{r}
 data %>%
   mutate(year = year(date_joined)) %>%
@@ -513,7 +526,7 @@ data %>%
   theme_minimal()
 ```
 
-### Valuation vs. Years to Unicorn
+## Valuation vs. Years to Unicorn
 ```{r}
 ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   geom_point(alpha = 0.8) +
@@ -527,15 +540,15 @@ ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   theme_minimal()
 ```
 
-## Key Findings
+# Key Findings
 * The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.
 * There is a positive correlation between funding and valuation, with a Pearson correlation coefficient of ~0.60 and a Spearman correlation coefficient of ~0.59. Funding accounts for about 36% of the variation in valuation.
 * AI companies tend to reach unicorn status faster but require more funding than Fintech companies.
 * AI investing favors larger checks with faster scaling, while Fintech offers lower average capital requirements but longer, less predictable paths to unicorn status.
 
-## Phase 4: Visual Storytelling & BI (Tableau)
+# Phase 4: Visual Storytelling & BI (Tableau)
 
-### Executive Summary
+## Executive Summary (The "TL;DR")
 This analysis provides a data-driven perspective on the structural realities of startup growth and capital formation. By examining both the distribution of time required to achieve unicorn status and the variation in average funding across industries, the findings highlight meaningful heterogeneity in growth trajectories and capital intensity. The results suggest that success timelines are not uniform and are strongly influenced by sector-specific dynamics, reinforcing the importance of contextual benchmarks when evaluating startup performance.
 
 While the analysis offers valuable descriptive insights, it is limited by the scope and granularity of the available data. Future work could extend this approach by incorporating longitudinal funding rounds, geographic controls, or macroeconomic conditions to better isolate causal relationships. Overall, this phase establishes a solid empirical foundation for deeper inferential or predictive modeling in subsequent stages of the project.
