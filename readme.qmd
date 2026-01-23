@@ -50,7 +50,7 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 
 Used the following Excel formula to convert shorthand ($8B, $200M) into long-form integers:
 
-```{html}
+```excel
 =IF(RIGHT(B2,1)="B", 
     SUBSTITUTE(SUBSTITUTE(B2,"$",""),"B","")*1000000000, 
     IF(RIGHT(B2,1)="M", 
@@ -190,6 +190,7 @@ library(scales)
 library(knitr)
 library(viridis)
 library(maps)
+library(patchwork)
 
 dollar_format_big <- function(x) {
   case_when(
@@ -211,13 +212,69 @@ glimpse(data)
 glimpse(data_geocoded)
 ```
 
+## Time-based Analysis
+
+### Distribution of Years Taken to Reach Unicorn Status
+
+```{r, warning = FALSE}
+ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
+  geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
+  geom_density(colour = "#404080") +
+  geom_vline(xintercept = mean(data$years_to_unicorn), colour = "#D55E00", linetype = "dashed") +
+  geom_vline(xintercept = median(data$years_to_unicorn), colour = "#0072B2", linetype = "dashed") +
+  annotate("text", x = 12, y = 0.1, label = "Mean", colour = "red") +
+  annotate("text", x = 2, y = 0.1, label = "Median", colour = "blue") +
+  labs(
+    title = "Distribution of Years to Reach Unicorn Status",
+    subtitle = sprintf("Mean: %.2f, Median: %.2f", 
+                       mean(data$years_to_unicorn), 
+                       median(data$years_to_unicorn)),
+    x = "Years to $1B valuation",
+    y = "Density"
+  ) +
+  theme_minimal() +
+  xlim(0, 50)
+```
+
+### Unicorns Founded Per Year & Joined Per Year
+
+```{r}
+yearly_counts <- bind_rows(
+  data %>%
+    mutate(year = year(year_founded)) %>%
+    group_by(year) %>%
+    summarise(count = n(), type = "Founded", .groups = "drop"),
+  data %>%
+    mutate(year = year(date_joined)) %>%
+    group_by(year) %>%
+    summarise(count = n(), type = "Joined", .groups = "drop")
+)
+
+ggplot(yearly_counts, aes(x = year, y = count, color = type)) +
+  geom_line(linewidth = 1.1) +
+  labs(
+    title = "Unicorns Founded vs Joined Per Year",
+    x = "Year",
+    y = "Number of Unicorns",
+    color = NULL
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    legend.position = "top"
+  )
+```
+
 ## Analysing Relationship Between Variables.
 
 ### Correlation Matrix
 
 ```{r}
 data %>%
-  select(valuation, funding, years_to_unicorn) %>%
+  mutate(
+    year_founded_num = year(year_founded),
+    year_joined_num = year(date_joined)
+  ) %>%
+  select(valuation, funding, years_to_unicorn, year_founded_num, year_joined_num) %>%
   drop_na() %>%
   cor(method = "spearman") %>%
   as.data.frame() %>%
@@ -225,10 +282,24 @@ data %>%
   pivot_longer(-var1, names_to = "var2", values_to = "correlation") %>%
   ggplot(aes(var1, var2, fill = correlation)) +
   geom_tile(color = "white", linewidth = 0.6) +
-  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-1, 1)) +
+  scale_fill_gradient2(
+    low = "#2166AC",
+    mid = "white",
+    high = "#B2182B",
+    midpoint = 0,
+    limits = c(-1, 1)
+  ) +
   geom_text(aes(label = round(correlation, 2)), size = 4) +
-  labs(title = "Spearman Correlation Heatmap", x = NULL, y = NULL, fill = "ρ") +
-  theme_minimal(base_size = 13)
+  labs(
+    title = "Spearman Correlation Heatmap",
+    x = NULL,
+    y = NULL,
+    fill = "ρ"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
 ```
 
 ### Total Funding vs. Valuation
@@ -244,6 +315,27 @@ ggplot(data, aes(x = funding, y = valuation, color = industry)) +
        x = "Total Funding (USD)", 
        y = "Current Valuation (USD)", 
        caption = "Note: Log scale axes") +
+  theme_minimal()
+```
+
+### Year Founded vs. Year Joined Unicorn Status
+
+```{r}
+data %>%
+  mutate(
+    year_founded_num = year(year_founded),
+    year_joined_num = year(date_joined)
+  ) %>%
+  ggplot(aes(x = year_founded_num, y = year_joined_num)) +
+  geom_point(aes(color = years_to_unicorn), alpha = 0.6, size = 2) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  scale_color_viridis_c(name = "Years to\nUnicorn") +
+  labs(
+    title = "Year Founded vs Year Joined Unicorn Status",
+    subtitle = "Color indicates time taken to reach unicorn status",
+    x = "Year Founded",
+    y = "Year Joined"
+  ) +
   theme_minimal()
 ```
 
@@ -277,7 +369,10 @@ ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
     y = "Current Valuation (USD)",
     caption = "Note: Log scale with linear trend"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "bottom"
+  )
 ```
 
 ## Industry Deep-Dive: `AI` vs `Fintech`
@@ -317,7 +412,10 @@ ggplot(comparison_data, aes(industry, years_to_unicorn, fill = industry)) +
        subtitle = "Years from Founding to $1B Valuation",
        x = "Industries",
        y = "Years") +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "top"
+  )
 ```
 
 ### Funding Requirements (Mean Funding)
@@ -331,7 +429,10 @@ ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
   labs(title = "Average Capital Requirement",
        x = "Industries",
        y = "Average Funding Raised (USD)") +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    legend.position = "top"
+  )
 ```
 
 ## Geographic Analysis
@@ -423,63 +524,6 @@ data %>%
   ) +
   theme_minimal()
 ```
-
-## Time-based Analysis
-
-### Distribution of Years Taken to Reach Unicorn Status
-
-```{r, warning = FALSE}
-ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
-  geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
-  geom_density(colour = "#404080") +
-  geom_vline(xintercept = mean(data$years_to_unicorn), colour = "#D55E00", linetype = "dashed") +
-  geom_vline(xintercept = median(data$years_to_unicorn), colour = "#0072B2", linetype = "dashed") +
-  annotate("text", x = 12, y = 0.1, label = "Mean", colour = "red") +
-  annotate("text", x = 2, y = 0.1, label = "Median", colour = "blue") +
-  labs(
-    title = "Distribution of Years to Reach Unicorn Status",
-    subtitle = sprintf("Mean: %.2f, Median: %.2f", 
-                       mean(data$years_to_unicorn), 
-                       median(data$years_to_unicorn)),
-    x = "Years to $1B valuation",
-    y = "Density"
-  ) +
-  theme_minimal() +
-  xlim(0, 50)
-```
-
-### Unicorns Founded Per Year & Joined Per Year
-
-```{r}
-fpr <- data %>%
-        mutate(year = year(year_founded)) %>%
-        group_by(year) %>%
-        summarise(count = n()) %>%
-        ggplot(aes(x = year, y = count)) +
-        geom_line() +
-        labs(
-          title = "Unicorns Founded Per Year",
-          x = "Year",
-          y = "Number of Unicorns"
-        ) +
-        theme_minimal()
-
-jpr <- data %>%
-        mutate(year = year(date_joined)) %>%
-        group_by(year) %>%
-        summarise(count = n()) %>%
-        ggplot(aes(x = year, y = count)) +
-        geom_line() +
-        labs(
-          title = "Unicorns Joined Per Year",
-          x = "Year",
-          y = "Number of Unicorns"
-        ) +
-        theme_minimal()
-
-print(fpr / jpr)
-```
-
 
 ## Key Findings
 * The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.
