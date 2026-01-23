@@ -1,8 +1,13 @@
 ---
 title: "Chasing Billions: The Global Unicorn Landscape"
+subtitle: "Funding, Valuation, and Growth Dynamics of Billion-Dollar Startups"
 author: "Himangshu Chetia"
-output: html_document
 date: "2026-01-16"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
 ---
 
 ## The Business Problem
@@ -41,19 +46,33 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 
 *Goal: Perform heavy-duty aggregation and multi-dimensional filtering.*
 
-* **Currency Normalization:** Used the following Excel formula to convert shorthand ($8B, $200M) into long-form integers:
+## Currency Normalization
 
-    `IF(RIGHT(B2,1)="B", SUBSTITUTE(SUBSTITUTE(B2,"$",""),"B","")*1000000000, IF(RIGHT(B2,1)="M", SUBSTITUTE(SUBSTITUTE(B2,"$",""),"M","")*1000000, SUBSTITUTE(B2,"$","")*1))`
+Used the following Excel formula to convert shorthand ($8B, $200M) into long-form integers:
 
-* **Date Standardization:** Converted all dates into the `YYYY-MM-DD` format
+```{html}
+=IF(RIGHT(B2,1)="B", 
+    SUBSTITUTE(SUBSTITUTE(B2,"$",""),"B","")*1000000000, 
+    IF(RIGHT(B2,1)="M", 
+        SUBSTITUTE(SUBSTITUTE(B2,"$",""),"M","")*1000000, 
+        SUBSTITUTE(B2,"$","")*1
+    )
+)
+```
 
-* **Data Integrity Check:**
+## Date Standardization
 
-    * Identified and fixed outliers in the date columns where `Year Founded` > `Date Joined` using the `DATEDIF` function.
+* Converted all dates into the `YYYY-MM-DD` format
 
-    * Imputed missing values (like the Singapore,Hong Kong and Bahamas city gap).
+* Identified and fixed outliers in the date columns where `Year Founded` > `Date Joined` using the `DATEDIF` function.
 
-* **Data Transformation (Wide to Long):** Created another dataset containing only company and investor columns by converting the wide data into long format using the following R script:
+* Imputed missing values (like the Singapore,Hong Kong and Bahamas city gap).
+
+## Data Transformation
+
+### Wide to Long Format
+
+Created a dataset (dataset_long.csv)containing only company and investor columns by converting the wide data into long format using the following R script:
 
 ```r
 # Load the necessary libraries
@@ -73,16 +92,18 @@ view(df_long)
 # Save the file
 readr::write_csv(df_long, "dataset_long.csv")
 ```
+### Geocoding
 
-* **Final Export:** Generated two cleaned `.csv` files to be used in all subsequent tools.
+Created a dataset (geocoded_unicorns.csv) cntaining the Latitude and Longitude of the cities.
 
 # Phase 2: Database Management & SQL Analysis
 
 *Goal: Establish the baseline metrics.*
 
-* **Schema Design:** Imported the cleaned data into MySQL with appropriate data types.
+## The "Efficiency" Query:
 
-* **The "Efficiency" Query:** Performed the following SQL query to filter the companies that reached Unicorn status within 5 years:
+Performed the following SQL query to filter the companies that reached Unicorn status within 5 years:
+
 ```sql
 SELECT company, years_to_unicorn
 FROM (
@@ -96,7 +117,10 @@ WHERE years_to_unicorn <= 5
 ORDER BY years_to_unicorn;
 ```
 
-* **Geographic Grouping:** Performed the following query to find the `Average Valuation` per startup per country:
+## Geographic Grouping:
+
+Performed the following query to find the `Average Valuation` per startup per country:
+
 ```sql
 SELECT
 	country,
@@ -106,7 +130,9 @@ GROUP BY country
 ORDER BY average_valuation DESC;
 ```
 
-* **Investor Counting:** Wrote the following query to identify which specific investors appear most frequently in the "Top 10%" of the most efficient startups:
+## Investor Counting:
+
+Wrote the following query to identify which specific investors appear most frequently in the "Top 10%" of the most efficient startups:
 
 ```sql
 WITH enriched AS (
@@ -135,7 +161,9 @@ GROUP BY investors
 ORDER BY companies_invested DESC;
 ```
 
-* **Top valued industries:** Identified industries with the highest company valuations.
+## Top valued industries:
+
+Identified industries with the highest company valuations.
 
 ```sql
 SELECT
@@ -147,7 +175,14 @@ GROUP BY industry;
 
 # Phase 3: Statistical Discovery & Advanced EDA (R)
 
-## Load the necessary libraries.
+*Goal: Use R to uncover statistical relationships, validate assumptions, and extract non-obvious structure from the global unicorn dataset through rigorous exploratory and inferential analysis.*
+
+
+## Preaparation
+
+Load the necessary libraries, a function to format large numbers, set the working directory, load the datasets and calculate time to unicorn status.
+
+
 
 ```{r, message = FALSE}
 library(tidyverse)
@@ -155,291 +190,198 @@ library(scales)
 library(knitr)
 library(viridis)
 library(maps)
-library(tidygeocoder)
-```
 
-## Custom formatting function for large numbers
-```{r}
 dollar_format_big <- function(x) {
-  ifelse(x >= 1e9, paste0(x / 1e9, "B"),
-         ifelse(x >= 1e6, paste0(x / 1e6, "M"),
-                ifelse(x >= 1e3, paste0(x / 1e3, "K"), x)))
+  case_when(
+    x >= 1e9 ~ paste0(x / 1e9, "B"),
+    x >= 1e6 ~ paste0(x / 1e6, "M"),
+    x >= 1e3 ~ paste0(x / 1e3, "K"),
+    TRUE ~ as.character(x)
+  )
 }
-```
 
-```{r, echo = FALSE}
 setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
-```
 
-## Load the CSV file.
+data <- read_csv("dataset.csv") %>%
+  mutate(years_to_unicorn = year(date_joined) - year(year_founded))
 
-*Note on Granularity: Company-level metrics are derived solely from the primary dataset (`dataset.csv`). The long-format dataset (`dataset_long.csv`) is reserved for investor analysis only, as using it for general statistics would skew valuation and funding totals due to record duplication across multiple investors.*
+data_geocoded <- read_csv("geocoded_unicorns.csv")
 
-```{r}
-data <- read_csv("dataset.csv")
-```
-
-## Identify the structure of the dataset.
-
-```{r}
 glimpse(data)
+glimpse(data_geocoded)
 ```
 
-## Calculating Time to Unicorn Status
+## Analysing Relationship Between Variables.
+
+### Correlation Matrix
 
 ```{r}
-data <- data %>% 
-    mutate(
-        years_to_unicorn = year(date_joined) - year(year_founded)
-    )
+data %>%
+  select(valuation, funding, years_to_unicorn) %>%
+  drop_na() %>%
+  cor(method = "spearman") %>%
+  as.data.frame() %>%
+  mutate(var1 = rownames(.)) %>%
+  pivot_longer(-var1, names_to = "var2", values_to = "correlation") %>%
+  ggplot(aes(var1, var2, fill = correlation)) +
+  geom_tile(color = "white", linewidth = 0.6) +
+  scale_fill_gradient2(low = "#2166AC", mid = "white", high = "#B2182B", midpoint = 0, limits = c(-1, 1)) +
+  geom_text(aes(label = round(correlation, 2)), size = 4) +
+  labs(title = "Spearman Correlation Heatmap", x = NULL, y = NULL, fill = "ρ") +
+  theme_minimal(base_size = 13)
 ```
 
-```{r}
-glimpse(data)
-```
+### Total Funding vs. Valuation
 
-The `years_to_unicorn` column has been successfully added to the dataset.
-
-## Distribution Analysis
-
-Calculating `mean` and `median` of `years_to_unicorn`.
-
-```{r}
-mean_val   <- mean(data$years_to_unicorn)
-median_val <- median(data$years_to_unicorn)
-```
-```{r}
-print(mean_val)
-print(median_val)
-```
-
-Distribution of `years_to_unicorn`.
-
-```{r, warning = FALSE}
-ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
-  geom_histogram(
-    fill = "grey70",
-    colour = "white",
-    bins = 50,
-    alpha = 0.8
-  ) +
-  geom_density(
-    colour = "#404080"
-  ) +
-  geom_vline(
-    xintercept = mean_val,
-    colour = "#D55E00",
-    linetype = "dashed"
-  ) +
-  geom_vline(
-    xintercept = median_val,
-    colour = "#0072B2",
-    linetype = "dashed"
-  ) +
-    annotate(
-    "text",
-    x = 12,
-    y = 0.1,
-    label = "Mean",
-    colour = "red",
-  ) +
-  annotate(
-    "text",
-    x = 2,
-    y = 0.1,
-    label = "Median",
-    colour = "blue"
-  ) +
-  labs(
-    title = "Distribution of Years to Reach Unicorn Status",
-    subtitle = paste0("Mean: ", round(mean_val, 2), ", Median: ", round(median_val, 2)),
-    x = "Years to $1B valuation",
-    y = "Density"
-  ) +
-  theme_minimal() +
-  xlim(0,50)
-```
-
-## Correlation Testing: `Valuation` & `Funding`
-
-### **Pearson** and **Spearman** correlation coefficients
-
-```{r}
-cor(
-  data$funding,
-  data$valuation,
-  use = "complete.obs",
-  method = "pearson"
-)
-
-cor(
-  data$funding,
-  data$valuation,
-  use = "complete.obs",
-  method = "spearman"
-)
-```
-
-### Scatterplot
-
-```{r, message = FALSE}
+```{r, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = funding, y = valuation, color = industry)) +
-  geom_point(
-    alpha = 0.8,
-    na.rm = TRUE
-  ) +
-  geom_smooth(
-    method = "lm",
-    na.rm = TRUE,
-    colour = "darkred"
-  ) +
-  scale_x_log10(
-    labels = label_number(scale_cut = cut_short_scale())
-  ) +
-  scale_y_log10(
-    labels = label_number(scale_cut = cut_short_scale())
-  ) +
-  scale_color_viridis(discrete = TRUE) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE, colour = "#C0392B") +
+  scale_x_log10(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_color_viridis_d() +
+  labs(title = "Total Funding vs. Valuation",
+       x = "Total Funding (USD)", 
+       y = "Current Valuation (USD)", 
+       caption = "Note: Log scale axes") +
+  theme_minimal()
+```
+
+### Total Funding vs. Time to Unicorn
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data, aes(x = funding, y = years_to_unicorn)) +
+  geom_point(alpha = 0.8, color = "#457297ff") +
+  geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
+  scale_x_log10(labels = dollar_format_big, breaks = scales::log_breaks(n = 6)) +
   labs(
-    title = "Correlation: Total Funding vs. Valuation",
+    title = "Total Funding vs. Years to Unicorn",
     x = "Total Funding (USD)",
+    y = "Years to Unicorn",
+    caption = "Note: Log scale with LOESS trend"
+  ) +
+  theme_minimal()
+```
+
+### Valuation vs Tine to Unicorn
+
+```{r, message = FALSE, warning = FALSE}
+ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
+  geom_point(alpha = 0.8) +
+  geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
+  scale_y_log10(labels = dollar_format_big) +
+  scale_color_viridis_d() +
+  labs(
+    title = "Valuation vs. Years to Unicorn",
+    x = "Years to Unicorn",
     y = "Current Valuation (USD)",
-    caption = "Note: Axes are on a Logarithmic scale for better visibility."
+    caption = "Note: Log scale with linear trend"
   ) +
   theme_minimal()
 ```
 
 ## Industry Deep-Dive: `AI` vs `Fintech`
 
-### Temporary dataset restricted to just the two industries
-
-```{r}
-comparison_data <- data %>%
-    filter(industry %in% c("Artificial intelligence", "Fintech"))
-```
-
 ### Summary statistics table
-
 ```{r}
-comparison_stats <- comparison_data %>%
+data %>%
+  filter(industry %in% c("Artificial intelligence", "Fintech")) %>%
   group_by(industry) %>%
   summarise(
     Company_Count = n(),
     Avg_Years_to_Unicorn = mean(years_to_unicorn, na.rm = TRUE),
     Median_Years_to_Unicorn = median(years_to_unicorn, na.rm = TRUE),
     Avg_Funding_USD = mean(funding, na.rm = TRUE),
-    Median_Funding_USD = median(funding, na.rm = TRUE),
-  )
+    Median_Funding_USD = median(funding, na.rm = TRUE)
+  ) %>%
+  kable(caption = "Statistical Profile: AI vs. Fintech")
 
-kable(
-    comparison_stats,
-    caption = "Statistical Profile: AI vs. Fintech"
-)
+comparison_data <- data %>%
+  filter(industry %in% c("Artificial intelligence", "Fintech"))
+
+comparison_stats <- comparison_data %>%
+  group_by(industry) %>%
+  summarise(
+    Avg_Funding_USD = mean(funding, na.rm = TRUE),
+    Median_Funding_USD = median(funding, na.rm = TRUE)
+  )
 ```
 
 ### Comparing growth rate
-
 ```{r}
-ggplot(comparison_data, aes(x = industry, y = years_to_unicorn, fill = industry)) +
+ggplot(comparison_data, aes(industry, years_to_unicorn, fill = industry)) +
   geom_boxplot(alpha = 0.8) +
   geom_jitter(width = 0.2, alpha = 0.5) +
+  scale_fill_viridis_d() +
   labs(title = "Distribution of Growth Velocity", 
        subtitle = "Years from Founding to $1B Valuation",
-       y = "Years", x = "Industries") +
-  theme_minimal() +
-  scale_fill_viridis(discrete = TRUE)
+       x = "Industries",
+       y = "Years") +
+  theme_minimal()
 ```
 
 ### Funding Requirements (Mean Funding)
-
 ```{r}
-ggplot(comparison_stats,
-       aes(x = industry, y = Avg_Funding_USD, fill = industry)) +
+ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
   geom_col() +
-  geom_errorbar(
-    aes(ymin = Avg_Funding_USD - Median_Funding_USD,
-    ymax = Avg_Funding_USD + Median_Funding_USD),
-    width = 0.2) +
-  scale_y_continuous(
-    labels = label_number(scale_cut = cut_short_scale())
-  ) +
-  labs(
-    title = "Average Capital Requirement",
-    y = "Average Funding Raised (USD)",
-    x = "Industries"
-  ) +
-  theme_minimal() +
-  scale_fill_viridis(discrete = TRUE)
-
+  geom_errorbar(aes(ymin = Avg_Funding_USD - Median_Funding_USD,
+                    ymax = Avg_Funding_USD + Median_Funding_USD), width = 0.2) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_fill_viridis_d() +
+  labs(title = "Average Capital Requirement",
+       x = "Industries",
+       y = "Average Funding Raised (USD)") +
+  theme_minimal()
 ```
 
 ## Geographic Analysis
 
 ### Unicorn World Map
-```{r}
-geocoded_file <- "geocoded_unicorns.csv"
-if (file.exists(geocoded_file)) {
-  data_geocoded <- read_csv(geocoded_file)
-} else {
-  data_geocoded <- data %>%
-    geocode(city, method = 'osm', lat = latitude , long = longitude)
-  write_csv(data_geocoded, geocoded_file)
-}
-
-# Get world map data
-world_map <- map_data("world")
-
-# Plot the map
+```{r, message = FALSE}
 ggplot() +
-  geom_polygon(data = world_map, aes(x = long, y = lat, group = group), fill = "gray80", color = "white") +
-  geom_point(data = data_geocoded, aes(x = longitude, y = latitude, size = valuation, color = continent), alpha = 0.6) +
+  geom_polygon(data = map_data("world"), aes(long, lat, group = group), 
+               fill = "gray80", color = "white") +
+  geom_point(data = data_geocoded, aes(longitude, latitude, size = valuation, 
+             color = continent), alpha = 0.6) +
   scale_size_continuous(labels = dollar_format_big, name = "Valuation (USD)") +
-  scale_color_viridis(discrete = TRUE) +
-  labs(
-    title = "Global Distribution of Unicorn Companies",
-    x = "",
-    y = "",
-    color = "Continent"
-  ) +
+  scale_color_viridis_d() +
+  labs(title = "Global Distribution of Unicorn Companies", x = "", y = "", 
+       color = "Continent") +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  theme(
+    legend.position = "bottom",
+    legend.box = "vertical",
+    legend.margin = margin(t = 10)
+  ) +
+  guides(
+    size = guide_legend(order = 1, nrow = 1),
+    color = guide_legend(order = 2, nrow = 1)
+  )
 ```
 
 ### Top 10 Unicorn Countries
 ```{r}
 data %>%
-  group_by(country) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  top_n(10) %>%
-  ggplot(aes(x = reorder(country, count), y = count, fill = country)) +
+  count(country) %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(reorder(country, n), n, fill = country)) +
   geom_col() +
   coord_flip() +
-  scale_fill_viridis(discrete = TRUE) +
-  labs(
-    title = "Top 10 Unicorn Countries",
-    x = "Country",
-    y = "Number of Unicorns"
-  ) +
+  scale_fill_viridis_d() +
+  labs(title = "Top 10 Unicorn Countries", x = "Country", y = "Number of Unicorns") +
   theme_minimal()
 ```
 
 ### Top 10 Unicorn Cities
 ```{r}
 data %>%
-  group_by(city) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  top_n(10) %>%
-  ggplot(aes(x = reorder(city, count), y = count, fill = city)) +
+  count(city) %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(reorder(city, n), n, fill = city)) +
   geom_col() +
   coord_flip() +
-  scale_fill_viridis(discrete = TRUE) +
-  labs(
-    title = "Top 10 Unicorn Cities",
-    x = "City",
-    y = "Number of Unicorns"
-  ) +
+  scale_fill_viridis_d() +
+  labs(title = "Top 10 Unicorn Cities", x = "City", y = "Number of Unicorns") +
   theme_minimal()
 ```
 
@@ -484,51 +426,60 @@ data %>%
 
 ## Time-based Analysis
 
-### Unicorns Founded Per Year
-```{r}
-data %>%
-  mutate(year = year(year_founded)) %>%
-  group_by(year) %>%
-  summarise(count = n()) %>%
-  ggplot(aes(x = year, y = count)) +
-  geom_line() +
+### Distribution of Years Taken to Reach Unicorn Status
+
+```{r, warning = FALSE}
+ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
+  geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
+  geom_density(colour = "#404080") +
+  geom_vline(xintercept = mean(data$years_to_unicorn), colour = "#D55E00", linetype = "dashed") +
+  geom_vline(xintercept = median(data$years_to_unicorn), colour = "#0072B2", linetype = "dashed") +
+  annotate("text", x = 12, y = 0.1, label = "Mean", colour = "red") +
+  annotate("text", x = 2, y = 0.1, label = "Median", colour = "blue") +
   labs(
-    title = "Unicorns Founded Per Year",
-    x = "Year",
-    y = "Number of Unicorns"
+    title = "Distribution of Years to Reach Unicorn Status",
+    subtitle = sprintf("Mean: %.2f, Median: %.2f", 
+                       mean(data$years_to_unicorn), 
+                       median(data$years_to_unicorn)),
+    x = "Years to $1B valuation",
+    y = "Density"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  xlim(0, 50)
 ```
 
-## #Unicorns Joined Per Year
+### Unicorns Founded Per Year & Joined Per Year
+
 ```{r}
-data %>%
-  mutate(year = year(date_joined)) %>%
-  group_by(year) %>%
-  summarise(count = n()) %>%
-  ggplot(aes(x = year, y = count)) +
-  geom_line() +
-  labs(
-    title = "Unicorns Joined Per Year",
-    x = "Year",
-    y = "Number of Unicorns"
-  ) +
-  theme_minimal()
+fpr <- data %>%
+        mutate(year = year(year_founded)) %>%
+        group_by(year) %>%
+        summarise(count = n()) %>%
+        ggplot(aes(x = year, y = count)) +
+        geom_line() +
+        labs(
+          title = "Unicorns Founded Per Year",
+          x = "Year",
+          y = "Number of Unicorns"
+        ) +
+        theme_minimal()
+
+jpr <- data %>%
+        mutate(year = year(date_joined)) %>%
+        group_by(year) %>%
+        summarise(count = n()) %>%
+        ggplot(aes(x = year, y = count)) +
+        geom_line() +
+        labs(
+          title = "Unicorns Joined Per Year",
+          x = "Year",
+          y = "Number of Unicorns"
+        ) +
+        theme_minimal()
+
+print(fpr / jpr)
 ```
 
-### Valuation vs. Years to Unicorn
-```{r}
-ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
-  geom_point(alpha = 0.8) +
-  scale_y_log10(labels = dollar_format_big) +
-  scale_color_viridis(discrete = TRUE) +
-  labs(
-    title = "Valuation vs. Years to Unicorn",
-    x = "Years to Unicorn",
-    y = "Valuation (USD)"
-  ) +
-  theme_minimal()
-```
 
 ## Key Findings
 * The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.
