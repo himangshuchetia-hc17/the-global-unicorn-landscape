@@ -182,14 +182,13 @@ GROUP BY industry;
 
 Load the necessary libraries, a function to format large numbers, set the working directory, load the datasets and calculate time to unicorn status.
 
-
-
 ```{r, message = FALSE}
 library(tidyverse)
 library(scales)
 library(knitr)
 library(viridis)
 library(maps)
+library(treemapify)
 library(patchwork)
 
 dollar_format_big <- function(x) {
@@ -206,9 +205,12 @@ setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 data <- read_csv("dataset.csv") %>%
   mutate(years_to_unicorn = year(date_joined) - year(year_founded))
 
+data_long <- read_csv("dataset_long.csv")
+
 data_geocoded <- read_csv("geocoded_unicorns.csv")
 
 glimpse(data)
+glimpse(data_long)
 glimpse(data_geocoded)
 ```
 
@@ -239,32 +241,39 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
 ### Unicorns Founded Per Year & Joined Per Year
 
 ```{r}
-yearly_counts <- bind_rows(
-  data %>%
-    mutate(year = year(year_founded)) %>%
-    group_by(year) %>%
-    summarise(count = n(), type = "Founded", .groups = "drop"),
-  data %>%
-    mutate(year = year(date_joined)) %>%
-    group_by(year) %>%
-    summarise(count = n(), type = "Joined", .groups = "drop")
-)
+founded_counts <- data %>%
+  mutate(year = year(year_founded)) %>%
+  group_by(year) %>%
+  summarise(count = n(), .groups = "drop")
 
-ggplot(yearly_counts, aes(x = year, y = count, color = type)) +
-  geom_line(linewidth = 1.1) +
+joined_counts <- data %>%
+  mutate(year = year(date_joined)) %>%
+  group_by(year) %>%
+  summarise(count = n(), .groups = "drop")
+
+plot_founded <- ggplot(founded_counts, aes(x = year, y = count)) +
+  geom_line(linewidth = 1.1, color = "#F8766D") +
   labs(
-    title = "Unicorns Founded vs Joined Per Year",
+    title = "Unicorns Founded Per Year",
     x = "Year",
-    y = "Number of Unicorns",
-    color = NULL
+    y = "Number of Unicorns"
   ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    legend.position = "top"
-  )
+  theme_minimal(base_size = 13)
+
+plot_joined <- ggplot(joined_counts, aes(x = year, y = count)) +
+  geom_line(linewidth = 1.1, color = "#00BFC4") +
+  labs(
+    title = "Unicorns Joined Per Year",
+    x = "Year",
+    y = "Number of Unicorns"
+  ) +
+  theme_minimal(base_size = 13)
+
+plot_founded
+plot_joined
 ```
 
-## Analysing Relationship Between Variables.
+## Analysing Relationships Between Variables.
 
 ### Correlation Matrix
 
@@ -486,6 +495,25 @@ data %>%
   theme_minimal()
 ```
 
+### Valuation by Country and Industry
+
+```{r}
+data %>%
+  group_by(country, industry) %>%
+  summarise(total_valuation = sum(valuation), .groups = "drop") %>%
+  ggplot(aes(area = total_valuation, fill = country, subgroup = country,
+             label = paste(industry, dollar_format_big(total_valuation), sep = "\n"))) +
+  geom_treemap() +
+  geom_treemap_subgroup_border(size = 1) +
+  geom_treemap_subgroup_text(place = "centre", grow = TRUE, alpha = 0.5, 
+                             colour = "black", fontface = "italic", size = 14) +
+  geom_treemap_text(colour = "white", place = "topleft", reflow = TRUE, size = 10) +
+  scale_fill_viridis_d() +
+  labs(title = "Treemap: Country and Industry") +
+  theme_minimal(base_size = 16) +
+  theme(legend.position = "none")
+```
+
 ## Industry and Valuation Analysis
 
 ### Unicorns by Industry
@@ -521,6 +549,27 @@ data %>%
     title = "Total Valuation by Industry",
     x = "Industry",
     y = "Total Valuation (USD)"
+  ) +
+  theme_minimal()
+```
+
+## Investor Analysis
+
+### Top 10 Investors
+
+```{r}
+data_long %>%
+  filter(company %in% (data %>% filter(valuation >= quantile(valuation, 0.9)) %>% pull(company))) %>%
+  count(investors, name = "count") %>%
+  slice_max(count, n = 10) %>%
+  ggplot(aes(x = reorder(investors, count), y = count, fill = investors)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_viridis_d() +
+  labs(
+    title = "Top 10 Investors in Most Valuable Unicorns",
+    x = "Investor",
+    y = "Number of Unicorns"
   ) +
   theme_minimal()
 ```
