@@ -190,6 +190,10 @@ library(viridis)
 library(maps)
 library(treemapify)
 library(patchwork)
+library(ggraph)
+library(igraph)
+library(networkD3)
+library(visNetwork)
 
 dollar_format_big <- function(x) {
   case_when(
@@ -213,6 +217,8 @@ glimpse(data)
 glimpse(data_long)
 glimpse(data_geocoded)
 ```
+
+## Time-based Analysis
 
 ## Time-based Analysis
 
@@ -628,7 +634,7 @@ data %>%
 
 ## Investor Analysis
 
-### Top 10 Investors
+### Top 10 Investors in companies valued in top 10%
 
 ```{r top-10-investors}
 data_long %>%
@@ -647,15 +653,140 @@ data_long %>%
   theme_minimal()
 ```
 
-## Key Findings
-* The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.
-* There is a positive correlation between funding and valuation, with a Pearson correlation coefficient of ~0.60 and a Spearman correlation coefficient of ~0.59. Funding accounts for about 36% of the variation in valuation.
-* AI companies tend to reach unicorn status faster but require more funding than Fintech companies.
-* AI investing favors larger checks with faster scaling, while Fintech offers lower average capital requirements but longer, less predictable paths to unicorn status.
+### Network Graph: Investors in High-Valuation Unicorns
 
-# Phase 4: Visual Storytelling & BI (Tableau)
 
-## Executive Summary (The "TL;DR")
-This analysis provides a data-driven perspective on the structural realities of startup growth and capital formation. By examining both the distribution of time required to achieve unicorn status and the variation in average funding across industries, the findings highlight meaningful heterogeneity in growth trajectories and capital intensity. The results suggest that success timelines are not uniform and are strongly influenced by sector-specific dynamics, reinforcing the importance of contextual benchmarks when evaluating startup performance.
+```{r investor-network-graph, message = FALSE, warning = FALSE}
+top_high_value_companies <- data %>% 
+  filter(valuation >= quantile(valuation, 0.9)) %>% 
+  pull(company)
 
-While the analysis offers valuable descriptive insights, it is limited by the scope and granularity of the available data. Future work could extend this approach by incorporating longitudinal funding rounds, geographic controls, or macroeconomic conditions to better isolate causal relationships. Overall, this phase establishes a solid empirical foundation for deeper inferential or predictive modeling in subsequent stages of the project.
+top_investors <- data_long %>%
+  filter(company %in% top_high_value_companies) %>%
+  count(investors) %>%
+  slice_max(n, n = 10) %>%
+  pull(investors)
+
+investor_graph_data <- data_long %>%
+  filter(investors %in% top_investors,
+         company %in% top_high_value_companies) %>%
+  distinct(company, investors)
+
+graph <- graph_from_data_frame(investor_graph_data, directed = FALSE)
+V(graph)$type <- ifelse(V(graph)$name %in% top_investors, "Investor", "Company")
+
+ggraph(graph, layout = 'kk') +
+  geom_edge_link(color = "yellow", width = 0.5) +
+  geom_node_point(aes(color = type, size = type)) +
+  scale_size_manual(values = c("Investor" = 6, "Company" = 4)) +
+  scale_color_manual(values = c("Investor" = "#FF6B6B", "Company" = "#4ECDC4")) +
+  geom_node_text(aes(label = ifelse(type == "Investor", name, "")), 
+                 repel = TRUE, size = 3.5, fontface = "bold") +
+  theme_void() +
+  labs(title = "Network of Top Investors in High-Valuation Unicorns")
+```
+
+### Sankey Diagram: Investors in High-Valuation Unicorns
+
+```{r sankey-diagram, message=FALSE, warning=FALSE}
+top_investors <- data_long %>%
+  count(investors, sort = TRUE) %>%
+  slice_max(n, n = 10) %>%
+  pull(investors)
+
+sankey_data <- data_long %>%
+  filter(investors %in% top_investors) %>%
+  count(investors, industry, name = "value")
+
+nodes <- data.frame(name = unique(c(sankey_data$investors, sankey_data$industry)))
+
+links <- sankey_data %>%
+  mutate(source = match(investors, nodes$name) - 1,
+         target = match(industry, nodes$name) - 1)
+
+sankeyNetwork(Links = links, Nodes = nodes,
+              Source = "source", Target = "target",
+              Value = "value", NodeID = "name",
+              sinksRight = FALSE, 
+              nodeWidth = 20,           # Reduced from 30
+              nodePadding = 10,         # Add spacing between nodes
+              fontSize = 12,
+              units = "investments",
+              iterations = 0,           # Disable node repositioning
+              colourScale = JS("d3.scaleOrdinal(d3.schemeCategory20);"))
+```
+
+### Key Findings
+
+* Top Investors: Sequoia Capital China leads the list of investors in the most valuable unicorns, followed closely by Accel and Sequoia Capital (US). This highlights the global influence of the Sequoia brand across the two largest markets (US and China).
+
+* Strategic Networks: A dense "super-cluster" exists connecting major investors like Tiger Global, Sequoia, SoftBank, and Tencent, indicating they frequently co-invest in the same high-valuation companies. In contrast, firms like Accel and Kleiner Perkins appear as more independent nodes in this specific high-value network.
+
+* Capital Flow Concentration: Investment capital is overwhelmingly directed toward two dominant sectors: Fintech and Internet Software & Services. Major funds like Tiger Global and Insight Partners show massive, concentrated flows into these industries, while Sequoia Capital China displays a more diversified footprint including significant E-commerce activity.
+
+* Valuation vs. Volume: While Fintech attracts the highest valuation globally (~$800B+), Internet Software & Services remains the top sector for deal volume for many Western investors like Andreessen Horowitz and Accel.
+
+# Executive Summary
+
+The landscape of billion-dollar startups is defined by a "Golden Era" of founding (2010–2016) that culminated in a massive spike of unicorn births in 2021. While the United States and Fintech dominate the global aggregate, China holds a distinct valuation lead in Artificial Intelligence. Statistical analysis reveals that while capital correlates with valuation, it does not buy speed; simply raising more funds does not shorten the time to unicorn status.
+
+---
+
+1. Temporal Dynamics and Growth Velocity
+
+  * The Golden Era: The majority of current unicorns were founded between 2010 and 2016, with a significant "lag effect" observed afterward as newer companies mature.
+
+
+  * The 2021 Anomaly: A massive spike in companies achieving unicorn status occurred in 2021 (>500 companies), driven by aggressive post-pandemic venture capital activity.
+
+
+  * Time-to-Value: On average, it takes 7 years for a startup to reach a $1 billion valuation, with a median of 6 years. Newer companies are accelerating, showing a strong correlation between more recent founding years and faster times to unicorn status.
+
+2. Capital Efficiency and Valuation Mechanics
+
+  * Money vs. Speed: There is virtually zero correlation (-0.03) between total funding and the time it takes to become a unicorn, indicating that capital injection alone cannot accelerate a company's timeline to success.
+
+
+  * The Speed Limit: Reaching unicorn status quickly does not correlate with higher ultimate valuations; a company that sprints to $1B in 2 years is statistically no more valuable than one that takes 10 years.
+
+
+  * Valuation Correlation: There is a moderately strong positive correlation (0.59) between total funding and current valuation, confirming that while money doesn't buy speed, it does correlate with higher market value.
+
+3. Sector Spotlight: AI vs. Fintech
+
+  * Velocity: AI startups achieve unicorn status faster (median 5 years) compared to Fintech (median 6 years).
+
+  * Capital Structure (The Barbell Effect):
+
+    * AI: Shows a split personality. It has a higher average funding ($557M) due to expensive model builders, but a lower median funding ($302.5M), suggesting many AI startups are highly capital-efficient.
+
+
+    * Fintech: Requires a higher minimum capital floor due to regulatory compliance and balance sheet requirements.
+
+
+    * Scalability: AI startups benefit from near-zero marginal costs and exponential revenue growth, whereas Fintech scales linearly with transaction volume.
+
+4. Geographic & Industry Dominance
+
+  * Global Hierarchy: The United States leads globally (3x more unicorns than China), followed by China and India. In Europe, the UK is the dominant hub.
+
+
+  * Industry Leaders: Fintech is the #1 industry globally in both count and valuation (~$800B+), followed by Internet Software & Services.
+
+  * Strategic Specialization:
+
+
+    * USA: Dominates Internet Software ($444B) and Fintech ($454B).
+
+
+    * China: Surpasses the US in Artificial Intelligence valuation ($214B vs. US $135B) and leads in E-commerce.
+
+5. Investor Networks
+
+  * Top Players: Sequoia Capital China is the leading investor in high-value unicorns, highlighting the brand's dual dominance in both the US and Chinese markets.
+
+
+  * Cluster Dynamics: A "super-cluster" of co-investors exists among Tiger Global, SoftBank, and Tencent, who frequently back the same high-valuation companies.
+
+
+  * Capital Flow: Investment is heavily concentrated in Fintech and Internet Software, with major funds like Tiger Global and Insight Partners directing massive capital flows into these mature sectors.
