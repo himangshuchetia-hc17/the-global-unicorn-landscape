@@ -142,6 +142,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#distribution-of-years-taken-to-reach-unicorn-status" id="toc-distribution-of-years-taken-to-reach-unicorn-status" class="nav-link" data-scroll-target="#distribution-of-years-taken-to-reach-unicorn-status">Distribution of Years Taken to Reach Unicorn Status</a></li>
   <li><a href="#unicorns-founded-per-year-joined-per-year" id="toc-unicorns-founded-per-year-joined-per-year" class="nav-link" data-scroll-target="#unicorns-founded-per-year-joined-per-year">Unicorns Founded Per Year &amp; Joined Per Year</a></li>
+  <li><a href="#key-findings" id="toc-key-findings" class="nav-link" data-scroll-target="#key-findings">Key Findings</a></li>
   </ul></li>
   <li><a href="#analysing-relationships-between-variables." id="toc-analysing-relationships-between-variables." class="nav-link" data-scroll-target="#analysing-relationships-between-variables.">Analysing Relationships Between Variables.</a>
   <ul class="collapse">
@@ -150,12 +151,14 @@ window.Quarto = {
   <li><a href="#year-founded-vs.-year-joined-unicorn-status" id="toc-year-founded-vs.-year-joined-unicorn-status" class="nav-link" data-scroll-target="#year-founded-vs.-year-joined-unicorn-status">Year Founded vs.&nbsp;Year Joined Unicorn Status</a></li>
   <li><a href="#total-funding-vs.-time-to-unicorn" id="toc-total-funding-vs.-time-to-unicorn" class="nav-link" data-scroll-target="#total-funding-vs.-time-to-unicorn">Total Funding vs.&nbsp;Time to Unicorn</a></li>
   <li><a href="#valuation-vs-tine-to-unicorn" id="toc-valuation-vs-tine-to-unicorn" class="nav-link" data-scroll-target="#valuation-vs-tine-to-unicorn">Valuation vs Tine to Unicorn</a></li>
+  <li><a href="#key-findings-1" id="toc-key-findings-1" class="nav-link" data-scroll-target="#key-findings-1">Key Findings</a></li>
   </ul></li>
   <li><a href="#industry-deep-dive-ai-vs-fintech" id="toc-industry-deep-dive-ai-vs-fintech" class="nav-link" data-scroll-target="#industry-deep-dive-ai-vs-fintech">Industry Deep-Dive: <code>AI</code> vs <code>Fintech</code></a>
   <ul class="collapse">
   <li><a href="#summary-statistics-table" id="toc-summary-statistics-table" class="nav-link" data-scroll-target="#summary-statistics-table">Summary statistics table</a></li>
   <li><a href="#comparing-growth-rate" id="toc-comparing-growth-rate" class="nav-link" data-scroll-target="#comparing-growth-rate">Comparing growth rate</a></li>
   <li><a href="#funding-requirements-mean-funding" id="toc-funding-requirements-mean-funding" class="nav-link" data-scroll-target="#funding-requirements-mean-funding">Funding Requirements (Mean Funding)</a></li>
+  <li><a href="#key-findings-2" id="toc-key-findings-2" class="nav-link" data-scroll-target="#key-findings-2">Key Findings</a></li>
   </ul></li>
   <li><a href="#geographic-analysis" id="toc-geographic-analysis" class="nav-link" data-scroll-target="#geographic-analysis">Geographic Analysis</a>
   <ul class="collapse">
@@ -173,7 +176,7 @@ window.Quarto = {
   <ul class="collapse">
   <li><a href="#top-10-investors" id="toc-top-10-investors" class="nav-link" data-scroll-target="#top-10-investors">Top 10 Investors</a></li>
   </ul></li>
-  <li><a href="#key-findings" id="toc-key-findings" class="nav-link" data-scroll-target="#key-findings">Key Findings</a></li>
+  <li><a href="#key-findings-3" id="toc-key-findings-3" class="nav-link" data-scroll-target="#key-findings-3">Key Findings</a></li>
   </ul></li>
   <li><a href="#phase-4-visual-storytelling-bi-tableau" id="toc-phase-4-visual-storytelling-bi-tableau" class="nav-link" data-scroll-target="#phase-4-visual-storytelling-bi-tableau">Phase 4: Visual Storytelling &amp; BI (Tableau)</a>
   <ul class="collapse">
@@ -493,7 +496,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/dist-years-to-unicorn-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -534,7 +537,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/unicorns-founded-joined-per-year-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -542,11 +545,21 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/unicorns-founded-joined-per-year-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="key-findings" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings">Key Findings</h3>
+<ul>
+<li><p>The “Golden Era” (2010–2016): The majority of today’s unicorns were founded in this window, with a peak of over 150 companies being founded.</p></li>
+<li><p>The 2021 Anomaly: There was a massive, unprecedented spike in companies becoming unicorns in 2021 (&gt;500 companies), likely driven by aggressive venture capital activity post-pandemic.</p></li>
+<li><p>Time to Success: It takes an average of 7 years (Mean: 7.01) to reach a $1 billion valuation, though the median is slightly faster at 6 years. Some companies took 25+ years to reach unicorn status, thus pulling the mean towards right.</p></li>
+<li><p>The Lag Effect: The sharp drop in “Founding” numbers after 2016 isn’t a decline in startups; it simply reflects that companies founded recently haven’t had the requisite ~6-7 years growth window to reach unicorn status yet.</p></li>
+<li><p>Consistent Correlation: The ~6-year gap between the “Founding Peak” (2015) and the “Unicorn Status Peak” (2021) perfectly aligns with the median growth timeline shown in the distribution chart.</p></li>
+</ul>
 </section>
 </section>
 <section id="analysing-relationships-between-variables." class="level2">
@@ -588,7 +601,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/correlation-matrix-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -611,7 +624,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/funding-vs-valuation-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -639,7 +652,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/founded-vs-joined-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -662,7 +675,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/funding-vs-time-to-unicorn-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -689,11 +702,21 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/valuation-vs-time-to-unicorn-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="key-findings-1" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings-1">Key Findings</h3>
+<ul>
+<li><p>Money Equals Value (Mostly): There is a moderately strong positive correlation (0.59) between total funding and current valuation. This confirms the intuitive link that companies raising more capital generally achieve higher valuations, though the scatter plot shows significant variance, meaning capital efficiency varies widely by industry.</p></li>
+<li><p>Speed is Accelerating: There is a very strong negative correlation (-0.85) between the year a company was founded and the years it took to become a unicorn. This indicates that newer companies are reaching unicorn status much faster than their predecessors.</p></li>
+<li><p>The “Speed limit” of Success: The “Valuation vs.&nbsp;Years to Unicorn” chart reveals a flat trend line. Getting to unicorn status faster does not correlate with a higher ultimate valuation. A company that took 2 years to reach $1B is not necessarily more valuable today than one that took 10 years.</p></li>
+<li><p>Funding Doesn’t Buy Speed: Interestingly, the correlation between total funding and years to unicorn is effectively zero (-0.03). The scatter plot confirms a flat trend line, suggesting that simply pouring more money into a startup does not statistically shorten the time required to reach a $1B valuation.</p></li>
+<li><p>The “Wall” of 2021: The “Year Founded vs Year Joined” chart clearly visualizes the “lag” mentioned earlier. The data hits a hard “wall” around 2021-2022 where the red dashed line (representing the present day) cuts off the data. This visualizes why we saw the drop-off in the previous “Founded” charts: companies founded after 2017 simply haven’t hit the timeline boundary yet.</p></li>
+</ul>
 </section>
 </section>
 <section id="industry-deep-dive-ai-vs-fintech" class="level2">
@@ -775,14 +798,11 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Years from Founding to $1B Valuation"</span>,</span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Industries"</span>,</span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Years"</span>) <span class="sc">+</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/growth-rate-ai-vs-fintech-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -800,18 +820,30 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Average Capital Requirement"</span>,</span>
 <span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Industries"</span>,</span>
 <span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Average Funding Raised (USD)"</span>) <span class="sc">+</span></span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"top"</span></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/funding-requirements-ai-vs-fintech-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
+</section>
+<section id="key-findings-2" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings-2">Key Findings</h3>
+<ul>
+<li><p>Speed to Scale: AI startups reach unicorn status faster (median 5 years) compared to Fintech (median 6 years), showing a tighter, more consistent growth timeline.</p></li>
+<li><p>The Funding Divergence:</p>
+<ul>
+<li><p>Average: AI is higher ($557M vs.&nbsp;$486M) due to capital-intensive foundational models.</p></li>
+<li><p>Median: AI is lower ($302.5M vs.&nbsp;$370M), indicating the typical AI startup is actually more capital-efficient than Fintech.</p></li>
+</ul></li>
+<li><p>The “Barbell” Effect: The AI sector is split between expensive “Model Builders” (skewing the average up) and efficient “Model Users” (keeping the median low).</p></li>
+<li><p>Regulatory Costs: Fintech faces a high “minimum floor” for funding due to licensing, compliance teams, and balance sheet capital requirements.</p></li>
+<li><p>Burn Rate Advantage: AI startups save money simply by being faster; the 1-year speed advantage reduces the amount of “survival cash” or runway needed.</p></li>
+<li><p>Revenue Scalability: AI offers exponential revenue growth with near-zero marginal costs, whereas Fintech scales linearly based on transaction volume and costs.</p></li>
+</ul>
 </section>
 </section>
 <section id="geographic-analysis" class="level2">
@@ -841,7 +873,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/unicorn-world-map-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -862,7 +894,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/top-10-unicorn-countries-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -883,7 +915,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/top-10-unicorn-cities-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -909,7 +941,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/treemap-valuation-country-industry-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -938,7 +970,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/unicorns-by-industry-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -965,7 +997,7 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/valuation-by-industry-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -994,15 +1026,15 @@ $ longitude        &lt;dbl&gt; 116.4121440, -118.3426122, 114.0545429, -122.4075
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="readme_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="readme_files/figure-html/top-10-investors-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
 </section>
-<section id="key-findings" class="level2">
-<h2 class="anchored" data-anchor-id="key-findings">Key Findings</h2>
+<section id="key-findings-3" class="level2">
+<h2 class="anchored" data-anchor-id="key-findings-3">Key Findings</h2>
 <ul>
 <li>The distribution of years to reach unicorn status is right-skewed, with a median of 6 years and a mean of 7 years.</li>
 <li>There is a positive correlation between funding and valuation, with a Pearson correlation coefficient of ~0.60 and a Spearman correlation coefficient of ~0.59. Funding accounts for about 36% of the variation in valuation.</li>

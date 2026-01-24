@@ -182,7 +182,7 @@ GROUP BY industry;
 
 Load the necessary libraries, a function to format large numbers, set the working directory, load the datasets and calculate time to unicorn status.
 
-```{r, message = FALSE}
+```{r setup, message = FALSE}
 library(tidyverse)
 library(scales)
 library(knitr)
@@ -218,7 +218,7 @@ glimpse(data_geocoded)
 
 ### Distribution of Years Taken to Reach Unicorn Status
 
-```{r, warning = FALSE}
+```{r dist-years-to-unicorn, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
   geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
   geom_density(colour = "#404080") +
@@ -240,7 +240,7 @@ ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
 
 ### Unicorns Founded Per Year & Joined Per Year
 
-```{r}
+```{r unicorns-founded-joined-per-year}
 founded_counts <- data %>%
   mutate(year = year(year_founded)) %>%
   group_by(year) %>%
@@ -273,11 +273,24 @@ plot_founded
 plot_joined
 ```
 
+### Key Findings
+
+* The "Golden Era" (2010–2016): The majority of today's unicorns were founded in this window, with a peak of over 150 companies being founded.
+
+* The 2021 Anomaly: There was a massive, unprecedented spike in companies becoming unicorns in 2021 (>500 companies), likely driven by aggressive venture capital activity post-pandemic.
+
+* Time to Success: It takes an average of 7 years (Mean: 7.01) to reach a $1 billion valuation, though the median is slightly faster at 6 years. Some companies took 25+ years to reach unicorn status, thus pulling the mean towards right.
+
+* The Lag Effect: The sharp drop in "Founding" numbers after 2016 isn't a decline in startups; it simply reflects that companies founded recently haven't had the requisite ~6-7 years growth window to reach unicorn status yet.
+
+* Consistent Correlation: The ~6-year gap between the "Founding Peak" (2015) and the "Unicorn Status Peak" (2021) perfectly aligns with the median growth timeline shown in the distribution chart.
+
+
 ## Analysing Relationships Between Variables.
 
 ### Correlation Matrix
 
-```{r}
+```{r correlation-matrix}
 data %>%
   mutate(
     year_founded_num = year(year_founded),
@@ -313,7 +326,7 @@ data %>%
 
 ### Total Funding vs. Valuation
 
-```{r, message = FALSE, warning = FALSE}
+```{r funding-vs-valuation, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = funding, y = valuation, color = industry)) +
   geom_point(alpha = 0.8) +
   geom_smooth(method = "lm", se = FALSE, colour = "#C0392B") +
@@ -329,7 +342,7 @@ ggplot(data, aes(x = funding, y = valuation, color = industry)) +
 
 ### Year Founded vs. Year Joined Unicorn Status
 
-```{r}
+```{r founded-vs-joined}
 data %>%
   mutate(
     year_founded_num = year(year_founded),
@@ -350,7 +363,7 @@ data %>%
 
 ### Total Funding vs. Time to Unicorn
 
-```{r, message = FALSE, warning = FALSE}
+```{r funding-vs-time-to-unicorn, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = funding, y = years_to_unicorn)) +
   geom_point(alpha = 0.8, color = "#457297ff") +
   geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
@@ -366,7 +379,7 @@ ggplot(data, aes(x = funding, y = years_to_unicorn)) +
 
 ### Valuation vs Tine to Unicorn
 
-```{r, message = FALSE, warning = FALSE}
+```{r valuation-vs-time-to-unicorn, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   geom_point(alpha = 0.8) +
   geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
@@ -384,10 +397,22 @@ ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
   )
 ```
 
+### Key Findings
+
+* Money Equals Value (Mostly): There is a moderately strong positive correlation (0.59) between total funding and current valuation. This confirms the intuitive link that companies raising more capital generally achieve higher valuations, though the scatter plot shows significant variance, meaning capital efficiency varies widely by industry.
+
+* Speed is Accelerating: There is a very strong negative correlation (-0.85) between the year a company was founded and the years it took to become a unicorn. This indicates that newer companies are reaching unicorn status much faster than their predecessors.
+
+* The "Speed limit" of Success: The "Valuation vs. Years to Unicorn" chart reveals a flat trend line. Getting to unicorn status faster does not correlate with a higher ultimate valuation. A company that took 2 years to reach $1B is not necessarily more valuable today than one that took 10 years.
+
+* Funding Doesn't Buy Speed: Interestingly, the correlation between total funding and years to unicorn is effectively zero (-0.03). The scatter plot confirms a flat trend line, suggesting that simply pouring more money into a startup does not statistically shorten the time required to reach a $1B valuation.
+
+* The "Wall" of 2021: The "Year Founded vs Year Joined" chart clearly visualizes the "lag" mentioned earlier. The data hits a hard "wall" around 2021-2022 where the red dashed line (representing the present day) cuts off the data. This visualizes why we saw the drop-off in the previous "Founded" charts: companies founded after 2017 simply haven't hit the timeline boundary yet.
+
 ## Industry Deep-Dive: `AI` vs `Fintech`
 
 ### Summary statistics table
-```{r}
+```{r summary-stats-ai-vs-fintech}
 data %>%
   filter(industry %in% c("Artificial intelligence", "Fintech")) %>%
   group_by(industry) %>%
@@ -412,7 +437,7 @@ comparison_stats <- comparison_data %>%
 ```
 
 ### Comparing growth rate
-```{r}
+```{r growth-rate-ai-vs-fintech}
 ggplot(comparison_data, aes(industry, years_to_unicorn, fill = industry)) +
   geom_boxplot(alpha = 0.8) +
   geom_jitter(width = 0.2, alpha = 0.5) +
@@ -421,14 +446,11 @@ ggplot(comparison_data, aes(industry, years_to_unicorn, fill = industry)) +
        subtitle = "Years from Founding to $1B Valuation",
        x = "Industries",
        y = "Years") +
-  theme_minimal() +
-  theme(
-    legend.position = "top"
-  )
+  theme_minimal()
 ```
 
 ### Funding Requirements (Mean Funding)
-```{r}
+```{r funding-requirements-ai-vs-fintech}
 ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
   geom_col() +
   geom_errorbar(aes(ymin = Avg_Funding_USD - Median_Funding_USD,
@@ -438,16 +460,31 @@ ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
   labs(title = "Average Capital Requirement",
        x = "Industries",
        y = "Average Funding Raised (USD)") +
-  theme_minimal() +
-  theme(
-    legend.position = "top"
-  )
+  theme_minimal()
 ```
+
+### Key Findings
+
+* Speed to Scale: AI startups reach unicorn status faster (median 5 years) compared to Fintech (median 6 years), showing a tighter, more consistent growth timeline.
+
+* The Funding Divergence:
+
+  * Average: AI is higher ($557M vs. $486M) due to capital-intensive foundational models.
+
+  * Median: AI is lower ($302.5M vs. $370M), indicating the typical AI startup is actually more capital-efficient than Fintech.
+
+* The "Barbell" Effect: The AI sector is split between expensive "Model Builders" (skewing the average up) and efficient "Model Users" (keeping the median low).
+
+* Regulatory Costs: Fintech faces a high "minimum floor" for funding due to licensing, compliance teams, and balance sheet capital requirements.
+
+* Burn Rate Advantage: AI startups save money simply by being faster; the 1-year speed advantage reduces the amount of "survival cash" or runway needed.
+
+* Revenue Scalability: AI offers exponential revenue growth with near-zero marginal costs, whereas Fintech scales linearly based on transaction volume and costs.
 
 ## Geographic Analysis
 
 ### Unicorn World Map
-```{r, message = FALSE}
+```{r unicorn-world-map, message = FALSE}
 ggplot() +
   geom_polygon(data = map_data("world"), aes(long, lat, group = group), 
                fill = "gray80", color = "white") +
@@ -470,7 +507,7 @@ ggplot() +
 ```
 
 ### Top 10 Unicorn Countries
-```{r}
+```{r top-10-unicorn-countries}
 data %>%
   count(country) %>%
   slice_max(n, n = 10) %>%
@@ -483,7 +520,7 @@ data %>%
 ```
 
 ### Top 10 Unicorn Cities
-```{r}
+```{r top-10-unicorn-cities}
 data %>%
   count(city) %>%
   slice_max(n, n = 10) %>%
@@ -497,7 +534,7 @@ data %>%
 
 ### Valuation by Country and Industry
 
-```{r}
+```{r treemap-valuation-country-industry}
 data %>%
   group_by(country, industry) %>%
   summarise(total_valuation = sum(valuation), .groups = "drop") %>%
@@ -514,10 +551,30 @@ data %>%
   theme(legend.position = "none")
 ```
 
+### Key Findings
+
+* U.S. Dominance: The United States is the overwhelming global leader, hosting approximately 3x as many unicorns as China.
+
+* Top Cities: San Francisco (150+) and New York (~100) lead globally; Palo Alto's presence in the top 10 further highlights the Bay Area's density.
+
+* Asian Powerhouses: China ranks 2nd (led by Beijing, Shanghai, Shenzhen) and India ranks 3rd (anchored by Bengaluru).
+
+* European Hubs: The UK leads in Europe, followed by Germany and France, with London, Berlin, and Paris as key city centers.
+
+* Geographic Concentration: Unicorns are heavily concentrated in the Northern Hemisphere, with significantly lower density in South America, Africa, and Oceania.
+
+* Valuation Drivers by Region:
+
+  * U.S.: Dominated by Fintech ($454B) and Internet Software ($444B).
+
+  * China: Focused on AI ($214B) and E-commerce ($187B).
+
+  * U.K.: Primarily concentrated in Fintech ($147B).
+
 ## Industry and Valuation Analysis
 
 ### Unicorns by Industry
-```{r}
+```{r unicorns-by-industry}
 data %>%
   group_by(industry) %>%
   summarise(count = n()) %>%
@@ -535,7 +592,7 @@ data %>%
 ```
 
 ### Total Valuation by Industry
-```{r}
+```{r valuation-by-industry}
 data %>%
   group_by(industry) %>%
   summarise(total_valuation = sum(valuation)) %>%
@@ -553,11 +610,27 @@ data %>%
   theme_minimal()
 ```
 
+### Key Findings
+
+* Dominant Industries: Fintech is the leading industry globally, ranking first in both the number of unicorn companies (>200) and total valuation (~$800B+). Internet Software & Services follows as a strong second in both categories.
+
+* US Sector Strength: The United States holds the largest valuation share across most sectors, driven primarily by Fintech ($454B) and Internet Software & Services ($444B).
+
+* China's AI Lead: While the US dominates overall, China surpasses the US in the Artificial Intelligence sector, with a total valuation of $214B compared to the US's $135B.
+
+* Regional Specializations:
+
+  * China shows a heavy concentration in E-commerce ($187B) and Hardware.
+
+  * The United Kingdom is a major hub for Fintech, which accounts for $147B of its unicorn valuation.
+
+* Valuation Consistency: The top four industries—Fintech, Internet Software, E-commerce, and AI—remain consistent across both company count and total valuation, indicating these are the most mature and high-value sectors in the startup ecosystem.
+
 ## Investor Analysis
 
 ### Top 10 Investors
 
-```{r}
+```{r top-10-investors}
 data_long %>%
   filter(company %in% (data %>% filter(valuation >= quantile(valuation, 0.9)) %>% pull(company))) %>%
   count(investors, name = "count") %>%
