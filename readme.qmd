@@ -17,7 +17,7 @@ A Venture Capital (VC) firm wants to identify "efficient" unicorns (reaching $1B
 * **Excel:** Data entry, validation, and complex string manipulation to convert string values like `$8B` into integer values.
 * **SQL:** Structured querying and aggregation of the 1000+ company dataset.
 * **R:** Converting data from wide to long format, statistical analysis and R Markdown reporting.
-* **Tableau:** [Link to Dashboard] Interactive visualization of investor networks.
+* **Tableau:** Interactive visualization.
 
 ## Key Performance Indicators (KPIs)
 1. **Speed to Unicorn:** Years from foundation to $1B+
