@@ -189,25 +189,25 @@ library(knitr)
 library(viridis)
 library(maps)
 library(treemapify)
-library(patchwork)
 library(ggraph)
 library(igraph)
 library(networkD3)
-library(visNetwork)
 
+# Custom formatter for large numbers (B for billions, M for millions, K for thousands)
 dollar_format_big <- function(x) {
-  case_when(
-    x >= 1e9 ~ paste0(x / 1e9, "B"),
-    x >= 1e6 ~ paste0(x / 1e6, "M"),
-    x >= 1e3 ~ paste0(x / 1e3, "K"),
-    TRUE ~ as.character(x)
-  )
+    abs_x <- abs(x)
+    case_when(
+        abs_x >= 1e9 ~ paste0(sign(x), round(abs_x / 1e9, 1), "B"),
+        abs_x >= 1e6 ~ paste0(sign(x), round(abs_x / 1e6, 1), "M"),
+        abs_x >= 1e3 ~ paste0(sign(x), round(abs_x / 1e3, 1), "K"),
+        TRUE ~ as.character(x)
+    )
 }
 
 setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
 
 data <- read_csv("dataset.csv") %>%
-  mutate(years_to_unicorn = year(date_joined) - year(year_founded))
+    mutate(years_to_unicorn = year(date_joined) - year(year_founded))
 
 data_long <- read_csv("dataset_long.csv")
 
@@ -218,62 +218,117 @@ glimpse(data_long)
 glimpse(data_geocoded)
 ```
 
-## Time-based Analysis
+### Data Quality Check
+
+```{r data-quality-summary}
+cat("\n=== Missing Data Summary ===")
+cat("\nMissing values per column:\n")
+print(colSums(is.na(data)))
+cat("\nPercentage missing:\n")
+print(round(colSums(is.na(data)) / nrow(data) * 100, 2))
+cat("\nTotal observations:", nrow(data), "\n")
+```
+
+### Efficiency Thresholds
+
+```{r define-thresholds}
+# Define valuation thresholds once for consistency
+top_10_pct_threshold <- quantile(data$valuation, 0.9, na.rm = TRUE)
+cat(
+    "\nTop 10% valuation threshold: $",
+    dollar_format_big(top_10_pct_threshold),
+    "\n",
+    sep = ""
+)
+```
 
 ## Time-based Analysis
 
 ### Distribution of Years Taken to Reach Unicorn Status
 
 ```{r dist-years-to-unicorn, warning = FALSE}
+# Calculate dynamic label positions based on actual data
+mean_years <- mean(data$years_to_unicorn, na.rm = TRUE)
+median_years <- median(data$years_to_unicorn, na.rm = TRUE)
+max_years <- max(data$years_to_unicorn, na.rm = TRUE)
+data_clean <- data %>% drop_na(years_to_unicorn)
+max_density <- max(density(data_clean$years_to_unicorn)$y)
+
 ggplot(data, aes(x = years_to_unicorn, y = after_stat(density))) +
-  geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
-  geom_density(colour = "#404080") +
-  geom_vline(xintercept = mean(data$years_to_unicorn), colour = "#D55E00", linetype = "dashed") +
-  geom_vline(xintercept = median(data$years_to_unicorn), colour = "#0072B2", linetype = "dashed") +
-  annotate("text", x = 12, y = 0.1, label = "Mean", colour = "red") +
-  annotate("text", x = 2, y = 0.1, label = "Median", colour = "blue") +
-  labs(
-    title = "Distribution of Years to Reach Unicorn Status",
-    subtitle = sprintf("Mean: %.2f, Median: %.2f", 
-                       mean(data$years_to_unicorn), 
-                       median(data$years_to_unicorn)),
-    x = "Years to $1B valuation",
-    y = "Density"
-  ) +
-  theme_minimal() +
-  xlim(0, 50)
+    geom_histogram(fill = "grey70", colour = "white", bins = 50, alpha = 0.8) +
+    geom_density(colour = "#404080") +
+    geom_vline(
+        xintercept = mean_years,
+        colour = "#D55E00",
+        linetype = "dashed"
+    ) +
+    geom_vline(
+        xintercept = median_years,
+        colour = "#0072B2",
+        linetype = "dashed"
+    ) +
+    annotate(
+        "text",
+        x = mean_years * 1.3,
+        y = max_density * 0.85,
+        label = "Mean",
+        colour = "#D55E00",
+        size = 3.5,
+        fontface = "bold"
+    ) +
+    annotate(
+        "text",
+        x = median_years * 0.7,
+        y = max_density * 0.9,
+        label = "Median",
+        colour = "#0072B2",
+        size = 3.5,
+        fontface = "bold"
+    ) +
+    labs(
+        title = "Distribution of Years to Reach Unicorn Status",
+        subtitle = sprintf(
+            "Mean: %.2f, Median: %.2f",
+            mean(data$years_to_unicorn),
+            median(data$years_to_unicorn)
+        ),
+        x = "Years to $1B valuation",
+        y = "Density"
+    ) +
+    theme_minimal() +
+    xlim(0, 50)
 ```
 
 ### Unicorns Founded Per Year & Joined Per Year
 
 ```{r unicorns-founded-joined-per-year}
 founded_counts <- data %>%
-  mutate(year = year(year_founded)) %>%
-  group_by(year) %>%
-  summarise(count = n(), .groups = "drop")
+    mutate(year = year(year_founded)) %>%
+    group_by(year) %>%
+    summarise(count = n(), .groups = "drop")
 
 joined_counts <- data %>%
-  mutate(year = year(date_joined)) %>%
-  group_by(year) %>%
-  summarise(count = n(), .groups = "drop")
+    mutate(year = year(date_joined)) %>%
+    group_by(year) %>%
+    summarise(count = n(), .groups = "drop")
 
 plot_founded <- ggplot(founded_counts, aes(x = year, y = count)) +
-  geom_line(linewidth = 1.1, color = "#F8766D") +
-  labs(
-    title = "Unicorns Founded Per Year",
-    x = "Year",
-    y = "Number of Unicorns"
-  ) +
-  theme_minimal(base_size = 13)
+    geom_line(linewidth = 1.1, color = "#F8766D") +
+    labs(
+        title = "Unicorns Founded Per Year",
+        x = "Year",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal(base_size = 13)
 
 plot_joined <- ggplot(joined_counts, aes(x = year, y = count)) +
-  geom_line(linewidth = 1.1, color = "#00BFC4") +
-  labs(
-    title = "Unicorns Joined Per Year",
-    x = "Year",
-    y = "Number of Unicorns"
-  ) +
-  theme_minimal(base_size = 13)
+    geom_line(linewidth = 1.1, color = "#00BFC4") +
+    labs(
+        title = "Unicorns Joined Per Year",
+        x = "Year",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal(base_size = 13)
 
 plot_founded
 plot_joined
@@ -298,109 +353,163 @@ plot_joined
 
 ```{r correlation-matrix}
 data %>%
-  mutate(
-    year_founded_num = year(year_founded),
-    year_joined_num = year(date_joined)
-  ) %>%
-  select(valuation, funding, years_to_unicorn, year_founded_num, year_joined_num) %>%
-  drop_na() %>%
-  cor(method = "spearman") %>%
-  as.data.frame() %>%
-  mutate(var1 = rownames(.)) %>%
-  pivot_longer(-var1, names_to = "var2", values_to = "correlation") %>%
-  ggplot(aes(var1, var2, fill = correlation)) +
-  geom_tile(color = "white", linewidth = 0.6) +
-  scale_fill_gradient2(
-    low = "#2166AC",
-    mid = "white",
-    high = "#B2182B",
-    midpoint = 0,
-    limits = c(-1, 1)
-  ) +
-  geom_text(aes(label = round(correlation, 2)), size = 4) +
-  labs(
-    title = "Spearman Correlation Heatmap",
-    x = NULL,
-    y = NULL,
-    fill = "ρ"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
+    mutate(
+        year_founded_num = year(year_founded),
+        year_joined_num = year(date_joined)
+    ) %>%
+    select(
+        valuation,
+        funding,
+        years_to_unicorn,
+        year_founded_num,
+        year_joined_num
+    ) %>%
+    drop_na() %>%
+    cor(method = "spearman") %>%
+    as.data.frame() %>%
+    mutate(var1 = rownames(.)) %>%
+    pivot_longer(-var1, names_to = "var2", values_to = "correlation") %>%
+    ggplot(aes(var1, var2, fill = correlation)) +
+    geom_tile(color = "white", linewidth = 0.6) +
+    scale_fill_gradient2(
+        low = "#2166AC",
+        mid = "white",
+        high = "#B2182B",
+        midpoint = 0,
+        limits = c(-1, 1)
+    ) +
+    geom_text(aes(label = round(correlation, 2)), size = 4) +
+    labs(
+        title = "Spearman Correlation Heatmap",
+        x = NULL,
+        y = NULL,
+        fill = "ρ"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(
+        axis.text.x = element_text(angle = 45, hjust = 1)
+    )
 ```
 
-### Total Funding vs. Valuation
+### Linear Regression: Funding vs. Valuation
+
+```{r lm-funding-valuation}
+# Fit linear model on log-transformed data to account for exponential relationships
+model_fv <- lm(
+    log(valuation) ~ log(funding),
+    data = data %>% drop_na(valuation, funding)
+)
+
+# Extract model summary
+summary_fv <- summary(model_fv)
+cat("\n=== Funding vs. Valuation (Log-transformed Analysis) ===")
+cat(
+    "\nIntercept:",
+    round(summary_fv$coefficients[1, 1], 4),
+    "(p-value:",
+    round(summary_fv$coefficients[1, 4], 4),
+    ")"
+)
+cat(
+    "\nSlope (Funding effect):",
+    round(summary_fv$coefficients[2, 1], 4),
+    "(p-value:",
+    round(summary_fv$coefficients[2, 4], 4),
+    ")"
+)
+cat("\nR-squared:", round(summary_fv$r.squared, 4))
+cat(
+    "\nInterpretation: A 1% increase in funding is associated with a",
+    round(summary_fv$coefficients[2, 1], 4),
+    "% increase in valuation.\n"
+)
+```
+
+### Total Funding vs. Valuation (Top 5 Industries)
 
 ```{r funding-vs-valuation, message = FALSE, warning = FALSE}
-ggplot(data, aes(x = funding, y = valuation, color = industry)) +
-  geom_point(alpha = 0.8) +
-  geom_smooth(method = "lm", se = FALSE, colour = "#C0392B") +
-  scale_x_log10(labels = label_number(scale_cut = cut_short_scale())) +
-  scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +
-  scale_color_viridis_d() +
-  labs(title = "Total Funding vs. Valuation",
-       x = "Total Funding (USD)", 
-       y = "Current Valuation (USD)", 
-       caption = "Note: Log scale axes") +
-  theme_minimal()
+# Filter to top 5 industries by count for clearer visualization
+top_5_industries <- data %>%
+    count(industry, sort = TRUE) %>%
+    slice_max(n, n = 5) %>%
+    pull(industry)
+
+data %>%
+    filter(industry %in% top_5_industries) %>%
+    ggplot(aes(x = funding, y = valuation, color = industry)) +
+    geom_point(alpha = 0.8) +
+    geom_smooth(method = "lm", se = FALSE, colour = "#C0392B") +
+    scale_x_log10(labels = label_number(scale_cut = cut_short_scale())) +
+    scale_y_log10(labels = label_number(scale_cut = cut_short_scale())) +
+    scale_color_viridis_d() +
+    labs(
+        title = "Total Funding vs. Valuation (Top 5 Industries)",
+        subtitle = "Filtered to top 5 industries for clarity",
+        x = "Total Funding (USD)",
+        y = "Current Valuation (USD)",
+        caption = "Note: Log scale axes"
+    ) +
+    theme_minimal()
 ```
 
 ### Year Founded vs. Year Joined Unicorn Status
 
 ```{r founded-vs-joined}
 data %>%
-  mutate(
-    year_founded_num = year(year_founded),
-    year_joined_num = year(date_joined)
-  ) %>%
-  ggplot(aes(x = year_founded_num, y = year_joined_num)) +
-  geom_point(aes(color = years_to_unicorn), alpha = 0.6, size = 2) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
-  scale_color_viridis_c(name = "Years to\nUnicorn") +
-  labs(
-    title = "Year Founded vs Year Joined Unicorn Status",
-    subtitle = "Color indicates time taken to reach unicorn status",
-    x = "Year Founded",
-    y = "Year Joined"
-  ) +
-  theme_minimal()
+    mutate(
+        year_founded_num = year(year_founded),
+        year_joined_num = year(date_joined)
+    ) %>%
+    ggplot(aes(x = year_founded_num, y = year_joined_num)) +
+    geom_point(aes(color = years_to_unicorn), alpha = 0.6, size = 2) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+    scale_color_viridis_c(name = "Years to\nUnicorn") +
+    labs(
+        title = "Year Founded vs Year Joined Unicorn Status",
+        subtitle = "Color indicates time taken to reach unicorn status",
+        x = "Year Founded",
+        y = "Year Joined"
+    ) +
+    theme_minimal()
 ```
 
 ### Total Funding vs. Time to Unicorn
 
 ```{r funding-vs-time-to-unicorn, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = funding, y = years_to_unicorn)) +
-  geom_point(alpha = 0.8, color = "#457297ff") +
-  geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
-  scale_x_log10(labels = dollar_format_big, breaks = scales::log_breaks(n = 6)) +
-  labs(
-    title = "Total Funding vs. Years to Unicorn",
-    x = "Total Funding (USD)",
-    y = "Years to Unicorn",
-    caption = "Note: Log scale with LOESS trend"
-  ) +
-  theme_minimal()
+    geom_point(alpha = 0.8, color = "#457297ff") +
+    geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
+    scale_x_log10(
+        labels = dollar_format_big,
+        breaks = scales::log_breaks(n = 6)
+    ) +
+    labs(
+        title = "Total Funding vs. Years to Unicorn",
+        x = "Total Funding (USD)",
+        y = "Years to Unicorn",
+        caption = "Note: Log scale with LOESS trend"
+    ) +
+    theme_minimal()
 ```
 
 ### Valuation vs Tine to Unicorn
 
 ```{r valuation-vs-time-to-unicorn, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
-  geom_point(alpha = 0.8) +
-  geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
-  scale_y_log10(labels = dollar_format_big) +
-  scale_color_viridis_d() +
-  labs(
-    title = "Valuation vs. Years to Unicorn",
-    x = "Years to Unicorn",
-    y = "Current Valuation (USD)",
-    caption = "Note: Log scale with linear trend"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom"
-  )
+    geom_point(alpha = 0.8) +
+    geom_smooth(method = "lm", se = FALSE, color = "#C0392B") +
+    scale_y_log10(labels = dollar_format_big) +
+    scale_color_viridis_d() +
+    labs(
+        title = "Valuation vs. Years to Unicorn",
+        x = "Years to Unicorn",
+        y = "Current Valuation (USD)",
+        caption = "Note: Log scale with linear trend"
+    ) +
+    theme_minimal() +
+    theme(
+        legend.position = "bottom"
+    )
 ```
 
 ### Key Findings
@@ -419,54 +528,148 @@ ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
 
 ### Summary statistics table
 ```{r summary-stats-ai-vs-fintech}
-data %>%
-  filter(industry %in% c("Artificial intelligence", "Fintech")) %>%
-  group_by(industry) %>%
-  summarise(
-    Company_Count = n(),
-    Avg_Years_to_Unicorn = mean(years_to_unicorn, na.rm = TRUE),
-    Median_Years_to_Unicorn = median(years_to_unicorn, na.rm = TRUE),
-    Avg_Funding_USD = mean(funding, na.rm = TRUE),
-    Median_Funding_USD = median(funding, na.rm = TRUE)
-  ) %>%
-  kable(caption = "Statistical Profile: AI vs. Fintech")
+# Validate industry names exist in dataset
+industries_to_compare <- c("Artificial intelligence", "Fintech")
+industries_in_data <- industries_to_compare[
+    industries_to_compare %in% unique(data$industry)
+]
+
+if (length(industries_in_data) == 0) {
+    cat("\nWarning: Neither industry found in dataset. Available industries:\n")
+    print(unique(data$industry))
+} else if (length(industries_in_data) < 2) {
+    cat(
+        "\nWarning: Only",
+        length(industries_in_data),
+        "of 2 industries found in dataset.\n"
+    )
+}
 
 comparison_data <- data %>%
-  filter(industry %in% c("Artificial intelligence", "Fintech"))
+    filter(industry %in% industries_in_data)
+
+comparison_data %>%
+    group_by(industry) %>%
+    summarise(
+        Company_Count = n(),
+        Avg_Years_to_Unicorn = mean(years_to_unicorn, na.rm = TRUE),
+        Median_Years_to_Unicorn = median(years_to_unicorn, na.rm = TRUE),
+        Avg_Funding_USD = mean(funding, na.rm = TRUE),
+        Median_Funding_USD = median(funding, na.rm = TRUE)
+    ) %>%
+    kable(caption = "Statistical Profile: AI vs. Fintech")
 
 comparison_stats <- comparison_data %>%
-  group_by(industry) %>%
-  summarise(
-    Avg_Funding_USD = mean(funding, na.rm = TRUE),
-    Median_Funding_USD = median(funding, na.rm = TRUE)
-  )
+    group_by(industry) %>%
+    summarise(
+        Avg_Funding_USD = mean(funding, na.rm = TRUE),
+        Median_Funding_USD = median(funding, na.rm = TRUE)
+    )
 ```
 
 ### Comparing growth rate
 ```{r growth-rate-ai-vs-fintech}
 ggplot(comparison_data, aes(industry, years_to_unicorn, fill = industry)) +
-  geom_boxplot(alpha = 0.8) +
-  geom_jitter(width = 0.2, alpha = 0.5) +
-  scale_fill_viridis_d() +
-  labs(title = "Distribution of Growth Velocity", 
-       subtitle = "Years from Founding to $1B Valuation",
-       x = "Industries",
-       y = "Years") +
-  theme_minimal()
+    geom_boxplot(alpha = 0.8) +
+    geom_jitter(width = 0.2, alpha = 0.5) +
+    scale_fill_viridis_d() +
+    labs(
+        title = "Distribution of Growth Velocity",
+        subtitle = "Years from Founding to $1B Valuation",
+        x = "Industries",
+        y = "Years"
+    ) +
+    theme_minimal()
 ```
 
 ### Funding Requirements (Mean Funding)
 ```{r funding-requirements-ai-vs-fintech}
 ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
-  geom_col() +
-  geom_errorbar(aes(ymin = Avg_Funding_USD - Median_Funding_USD,
-                    ymax = Avg_Funding_USD + Median_Funding_USD), width = 0.2) +
-  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
-  scale_fill_viridis_d() +
-  labs(title = "Average Capital Requirement",
-       x = "Industries",
-       y = "Average Funding Raised (USD)") +
-  theme_minimal()
+    geom_col() +
+    geom_errorbar(
+        aes(
+            ymin = Avg_Funding_USD - Median_Funding_USD,
+            ymax = Avg_Funding_USD + Median_Funding_USD
+        ),
+        width = 0.2
+    ) +
+    scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+    scale_fill_viridis_d() +
+    labs(
+        title = "Average Capital Requirement",
+        x = "Industries",
+        y = "Average Funding Raised (USD)"
+    ) +
+    theme_minimal()
+```
+
+### Hypothesis Test: Speed Difference (AI vs. Fintech)
+```{r hypothesis-test-ai-vs-fintech}
+if (
+    length(unique(comparison_data$industry)) == 2 && nrow(comparison_data) > 0
+) {
+    # Extract years_to_unicorn by industry, removing missing values
+    ai_years <- comparison_data %>%
+        filter(industry == "Artificial intelligence") %>%
+        pull(years_to_unicorn) %>%
+        na.omit()
+
+    fintech_years <- comparison_data %>%
+        filter(industry == "Fintech") %>%
+        pull(years_to_unicorn) %>%
+        na.omit()
+
+    if (length(ai_years) > 0 && length(fintech_years) > 0) {
+        # Perform Mann-Whitney U test (non-parametric, robust to outliers)
+        test_result <- wilcox.test(
+            ai_years,
+            fintech_years,
+            alternative = "two.sided"
+        )
+
+        cat("\n=== Mann-Whitney U Test: Time to Unicorn Status ===")
+        cat(
+            "\nNull Hypothesis: No difference in distribution of years between AI and Fintech"
+        )
+        cat(
+            "\nAI startups (n=",
+            length(ai_years),
+            "): Median =",
+            median(ai_years),
+            "years, Mean =",
+            round(mean(ai_years), 2),
+            "years"
+        )
+        cat(
+            "\nFintech startups (n=",
+            length(fintech_years),
+            "): Median =",
+            median(fintech_years),
+            "years, Mean =",
+            round(mean(fintech_years), 2),
+            "years"
+        )
+        cat("\nTest Statistic (U):", test_result$statistic)
+        cat("\np-value:", round(test_result$p.value, 4))
+        cat(
+            "\nConclusion: ",
+            ifelse(
+                test_result$p.value < 0.05,
+                "SIGNIFICANT difference found (reject null hypothesis)",
+                "NO significant difference found (fail to reject null hypothesis)"
+            ),
+            "\n"
+        )
+    } else {
+        cat(
+            "\nError: One or both groups have no valid data for hypothesis testing.\n"
+        )
+    }
+} else {
+    cat(
+        "\nError: Cannot perform hypothesis test. Ensure both industries are present in comparison data.\n"
+    )
+}
 ```
 
 ### Key Findings
@@ -492,69 +695,106 @@ ggplot(comparison_stats, aes(industry, Avg_Funding_USD, fill = industry)) +
 ### Unicorn World Map
 ```{r unicorn-world-map, message = FALSE}
 ggplot() +
-  geom_polygon(data = map_data("world"), aes(long, lat, group = group), 
-               fill = "gray80", color = "white") +
-  geom_point(data = data_geocoded, aes(longitude, latitude, size = valuation, 
-             color = continent), alpha = 0.6) +
-  scale_size_continuous(labels = dollar_format_big, name = "Valuation (USD)") +
-  scale_color_viridis_d() +
-  labs(title = "Global Distribution of Unicorn Companies", x = "", y = "", 
-       color = "Continent") +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    legend.box = "vertical",
-    legend.margin = margin(t = 10)
-  ) +
-  guides(
-    size = guide_legend(order = 1, nrow = 1),
-    color = guide_legend(order = 2, nrow = 1)
-  )
+    geom_polygon(
+        data = map_data("world"),
+        aes(long, lat, group = group),
+        fill = "gray80",
+        color = "white"
+    ) +
+    geom_point(
+        data = data_geocoded,
+        aes(longitude, latitude, size = valuation, color = continent),
+        alpha = 0.6
+    ) +
+    scale_size_continuous(
+        labels = dollar_format_big,
+        name = "Valuation (USD)"
+    ) +
+    scale_color_viridis_d() +
+    labs(
+        title = "Global Distribution of Unicorn Companies",
+        x = "",
+        y = "",
+        color = "Continent"
+    ) +
+    theme_minimal() +
+    theme(
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.margin = margin(t = 10)
+    ) +
+    guides(
+        size = guide_legend(order = 1, nrow = 1),
+        color = guide_legend(order = 2, nrow = 1)
+    )
 ```
 
 ### Top 10 Unicorn Countries
 ```{r top-10-unicorn-countries}
 data %>%
-  count(country) %>%
-  slice_max(n, n = 10) %>%
-  ggplot(aes(reorder(country, n), n, fill = country)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_viridis_d() +
-  labs(title = "Top 10 Unicorn Countries", x = "Country", y = "Number of Unicorns") +
-  theme_minimal()
+    count(country) %>%
+    slice_max(n, n = 10) %>%
+    ggplot(aes(reorder(country, n), n, fill = country)) +
+    geom_col() +
+    coord_flip() +
+    scale_fill_viridis_d() +
+    labs(
+        title = "Top 10 Unicorn Countries",
+        x = "Country",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal()
 ```
 
 ### Top 10 Unicorn Cities
 ```{r top-10-unicorn-cities}
 data %>%
-  count(city) %>%
-  slice_max(n, n = 10) %>%
-  ggplot(aes(reorder(city, n), n, fill = city)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_viridis_d() +
-  labs(title = "Top 10 Unicorn Cities", x = "City", y = "Number of Unicorns") +
-  theme_minimal()
+    count(city) %>%
+    slice_max(n, n = 10) %>%
+    ggplot(aes(reorder(city, n), n, fill = city)) +
+    geom_col() +
+    coord_flip() +
+    scale_fill_viridis_d() +
+    labs(
+        title = "Top 10 Unicorn Cities",
+        x = "City",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal()
 ```
 
 ### Valuation by Country and Industry
 
 ```{r treemap-valuation-country-industry}
 data %>%
-  group_by(country, industry) %>%
-  summarise(total_valuation = sum(valuation), .groups = "drop") %>%
-  ggplot(aes(area = total_valuation, fill = country, subgroup = country,
-             label = paste(industry, dollar_format_big(total_valuation), sep = "\n"))) +
-  geom_treemap() +
-  geom_treemap_subgroup_border(size = 1) +
-  geom_treemap_subgroup_text(place = "centre", grow = TRUE, alpha = 0.5, 
-                             colour = "black", fontface = "italic", size = 14) +
-  geom_treemap_text(colour = "white", place = "topleft", reflow = TRUE, size = 10) +
-  scale_fill_viridis_d() +
-  labs(title = "Treemap: Country and Industry") +
-  theme_minimal(base_size = 16) +
-  theme(legend.position = "none")
+    group_by(country, industry) %>%
+    summarise(total_valuation = sum(valuation), .groups = "drop") %>%
+    ggplot(aes(
+        area = total_valuation,
+        fill = country,
+        subgroup = country,
+        label = paste(industry, dollar_format_big(total_valuation), sep = "\n")
+    )) +
+    geom_treemap() +
+    geom_treemap_subgroup_border(size = 1) +
+    geom_treemap_subgroup_text(
+        place = "centre",
+        grow = TRUE,
+        alpha = 0.5,
+        colour = "black",
+        fontface = "italic",
+        size = 14
+    ) +
+    geom_treemap_text(
+        colour = "white",
+        place = "topleft",
+        reflow = TRUE,
+        size = 10
+    ) +
+    scale_fill_viridis_d() +
+    labs(title = "Treemap: Country and Industry") +
+    theme_minimal(base_size = 16) +
+    theme(legend.position = "none")
 ```
 
 ### Key Findings
@@ -582,38 +822,42 @@ data %>%
 ### Unicorns by Industry
 ```{r unicorns-by-industry}
 data %>%
-  group_by(industry) %>%
-  summarise(count = n()) %>%
-  arrange(desc(count)) %>%
-  ggplot(aes(x = reorder(industry, count), y = count, fill = industry)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_viridis(discrete = TRUE) +
-  labs(
-    title = "Number of Unicorns by Industry",
-    x = "Industry",
-    y = "Number of Unicorns"
-  ) +
-  theme_minimal()
+    group_by(industry) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count)) %>%
+    ggplot(aes(x = reorder(industry, count), y = count, fill = industry)) +
+    geom_col() +
+    coord_flip() +
+    scale_fill_viridis(discrete = TRUE) +
+    labs(
+        title = "Number of Unicorns by Industry",
+        x = "Industry",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal()
 ```
 
 ### Total Valuation by Industry
 ```{r valuation-by-industry}
 data %>%
-  group_by(industry) %>%
-  summarise(total_valuation = sum(valuation)) %>%
-  arrange(desc(total_valuation)) %>%
-  ggplot(aes(x = reorder(industry, total_valuation), y = total_valuation, fill = industry)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_viridis(discrete = TRUE) +
-  scale_y_continuous(labels = dollar_format_big) +
-  labs(
-    title = "Total Valuation by Industry",
-    x = "Industry",
-    y = "Total Valuation (USD)"
-  ) +
-  theme_minimal()
+    group_by(industry) %>%
+    summarise(total_valuation = sum(valuation)) %>%
+    arrange(desc(total_valuation)) %>%
+    ggplot(aes(
+        x = reorder(industry, total_valuation),
+        y = total_valuation,
+        fill = industry
+    )) +
+    geom_col() +
+    coord_flip() +
+    scale_fill_viridis(discrete = TRUE) +
+    scale_y_continuous(labels = dollar_format_big) +
+    labs(
+        title = "Total Valuation by Industry",
+        x = "Industry",
+        y = "Total Valuation (USD)"
+    ) +
+    theme_minimal()
 ```
 
 ### Key Findings
@@ -638,82 +882,105 @@ data %>%
 
 ```{r top-10-investors}
 data_long %>%
-  filter(company %in% (data %>% filter(valuation >= quantile(valuation, 0.9)) %>% pull(company))) %>%
-  count(investors, name = "count") %>%
-  slice_max(count, n = 10) %>%
-  ggplot(aes(x = reorder(investors, count), y = count, fill = investors)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_viridis_d() +
-  labs(
-    title = "Top 10 Investors in Most Valuable Unicorns",
-    x = "Investor",
-    y = "Number of Unicorns"
-  ) +
-  theme_minimal()
+    filter(
+        company %in%
+            (data %>%
+                filter(valuation >= top_10_pct_threshold) %>%
+                pull(company))
+    ) %>%
+    count(investors, name = "count") %>%
+    slice_max(count, n = 10) %>%
+    ggplot(aes(x = reorder(investors, count), y = count, fill = investors)) +
+    geom_col() +
+    coord_flip() +
+    scale_fill_viridis_d() +
+    labs(
+        title = "Top 10 Investors in Most Valuable Unicorns",
+        x = "Investor",
+        y = "Number of Unicorns"
+    ) +
+    theme_minimal()
 ```
 
 ### Network Graph: Investors in High-Valuation Unicorns
 
 
 ```{r investor-network-graph, message = FALSE, warning = FALSE}
-top_high_value_companies <- data %>% 
-  filter(valuation >= quantile(valuation, 0.9)) %>% 
-  pull(company)
+top_high_value_companies <- data %>%
+    filter(valuation >= top_10_pct_threshold) %>%
+    pull(company)
 
 top_investors <- data_long %>%
-  filter(company %in% top_high_value_companies) %>%
-  count(investors) %>%
-  slice_max(n, n = 10) %>%
-  pull(investors)
+    filter(company %in% top_high_value_companies) %>%
+    count(investors) %>%
+    slice_max(n, n = 10) %>%
+    pull(investors)
 
 investor_graph_data <- data_long %>%
-  filter(investors %in% top_investors,
-         company %in% top_high_value_companies) %>%
-  distinct(company, investors)
+    filter(
+        investors %in% top_investors,
+        company %in% top_high_value_companies
+    ) %>%
+    distinct(company, investors)
 
 graph <- graph_from_data_frame(investor_graph_data, directed = FALSE)
 V(graph)$type <- ifelse(V(graph)$name %in% top_investors, "Investor", "Company")
 
-ggraph(graph, layout = 'kk') +
-  geom_edge_link(color = "yellow", width = 0.5) +
-  geom_node_point(aes(color = type, size = type)) +
-  scale_size_manual(values = c("Investor" = 6, "Company" = 4)) +
-  scale_color_manual(values = c("Investor" = "#FF6B6B", "Company" = "#4ECDC4")) +
-  geom_node_text(aes(label = ifelse(type == "Investor", name, "")), 
-                 repel = TRUE, size = 3.5, fontface = "bold") +
-  theme_void() +
-  labs(title = "Network of Top Investors in High-Valuation Unicorns")
+# Use Fruchterman-Reingold layout for superior node separation
+ggraph(graph, layout = 'fr') +
+    geom_edge_link(color = "yellow", width = 0.5) +
+    geom_node_point(aes(color = type, size = type)) +
+    scale_size_manual(values = c("Investor" = 6, "Company" = 4)) +
+    scale_color_manual(
+        values = c("Investor" = "#FF6B6B", "Company" = "#4ECDC4")
+    ) +
+    geom_node_text(
+        aes(label = ifelse(type == "Investor", name, "")),
+        repel = TRUE,
+        size = 3.5,
+        fontface = "bold"
+    ) +
+    theme_void() +
+    labs(title = "Network of Top Investors in High-Valuation Unicorns")
 ```
 
 ### Sankey Diagram: Investors in High-Valuation Unicorns
 
 ```{r sankey-diagram, message=FALSE, warning=FALSE}
 top_investors <- data_long %>%
-  count(investors, sort = TRUE) %>%
-  slice_max(n, n = 10) %>%
-  pull(investors)
+    count(investors, sort = TRUE) %>%
+    slice_max(n, n = 10) %>%
+    pull(investors)
 
 sankey_data <- data_long %>%
-  filter(investors %in% top_investors) %>%
-  count(investors, industry, name = "value")
+    filter(investors %in% top_investors) %>%
+    count(investors, industry, name = "value")
 
-nodes <- data.frame(name = unique(c(sankey_data$investors, sankey_data$industry)))
+nodes <- data.frame(
+    name = unique(c(sankey_data$investors, sankey_data$industry))
+)
 
 links <- sankey_data %>%
-  mutate(source = match(investors, nodes$name) - 1,
-         target = match(industry, nodes$name) - 1)
+    mutate(
+        source = match(investors, nodes$name) - 1,
+        target = match(industry, nodes$name) - 1
+    )
 
-sankeyNetwork(Links = links, Nodes = nodes,
-              Source = "source", Target = "target",
-              Value = "value", NodeID = "name",
-              sinksRight = FALSE, 
-              nodeWidth = 20,           # Reduced from 30
-              nodePadding = 10,         # Add spacing between nodes
-              fontSize = 12,
-              units = "investments",
-              iterations = 0,           # Disable node repositioning
-              colourScale = JS("d3.scaleOrdinal(d3.schemeCategory20);"))
+sankeyNetwork(
+    Links = links,
+    Nodes = nodes,
+    Source = "source",
+    Target = "target",
+    Value = "value",
+    NodeID = "name",
+    sinksRight = FALSE,
+    nodeWidth = 20, # Width of each node rectangle (reduced from 30 for compactness)
+    nodePadding = 10, # Vertical spacing between nodes to prevent overlap
+    fontSize = 12, # Font size for node labels and legend
+    units = "investments",
+    iterations = 0, # Disable automatic node repositioning (maintain fixed layout)
+    colourScale = JS("d3.scaleOrdinal(d3.schemeCategory20);")
+)
 ```
 
 ### Key Findings
