@@ -206,8 +206,6 @@ dollar_format_big <- function(x) {
     )
 }
 
-setwd(r"(/home/himangshu/Desktop/My_Projects/The_Global_Unicorn_Landscape)")
-
 data <- read_csv("dataset.csv") %>%
     mutate(years_to_unicorn = year(date_joined) - year(year_founded))
 
