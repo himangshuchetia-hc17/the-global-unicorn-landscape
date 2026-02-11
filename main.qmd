@@ -119,6 +119,22 @@ WHERE years_to_unicorn <= 5
 ORDER BY years_to_unicorn;
 ```
 
+| # | company | years_to_unicorn |
+|---|---------|------------------|
+| 1 | Ola Electric Mobility | 0 |
+| 2 | Flink Food | 0 |
+| 3 | candy.com | 0 |
+| 4 | Avant | 0 |
+| 5 | ClickHouse | 0 |
+| 6 | Jokr | 0 |
+| 7 | GlobalBees | 0 |
+| 8 | Mensa Brands | 0 |
+| 9 | Playco | 0 |
+| 10 | Devoted Health | 1 |
+| 11 | Brex | 1 |
+| 12 | Chiehaduo | 1 |
+| ... | ... | ... |
+
 ## Geographic Grouping:
 
 Performed the following query to find the `Average Valuation` per startup per country:
@@ -131,6 +147,22 @@ FROM dataset
 GROUP BY country
 ORDER BY average_valuation DESC;
 ```
+
+| # | country | average_valuation |
+|---|---------|------------------|
+| 1 | Bahamas | 3200000000 |
+| 2 | Sweden | 1050000170.660666 |
+| 3 | Australia | 7000000000 |
+| 4 | Estonia | 650000256 |
+| 5 | Turkey | 5333333333.333333 |
+| 6 | Lithuania | 5000000000 |
+| 7 | Indonesia | 4666666666.666667 |
+| 8 | United Kingdom | 4534883732.83721 |
+| 9 | China | 4023121369.5260115 |
+| 10 | Denmark | 3500000000 |
+| 11 | Austria | 3500000000 |
+| 12 | United States | 3439501772.9822063 |
+| ... | ... | ... |
 
 ## Investor Counting:
 
@@ -163,6 +195,22 @@ GROUP BY investors
 ORDER BY companies_invested DESC;
 ```
 
+| # | investors | companies_invested |
+|---|-----------|------------------|
+| 1 | Andreessen Horowitz | 7 |
+| 2 | Tiger Global Management | 5 |
+| 3 | DST Global | 4 |
+| 4 | Accel | 4 |
+| 5 | Index Ventures | 3 |
+| 6 | Thrive Capital | 3 |
+| 7 | Sequoia Capital | 3 |
+| 8 | SoftBank Group | 3 |
+| 9 | Insight Partners | 3 |
+| 10 | Benchmark | 2 |
+| 11 | General Catalyst | 2 |
+| 12 | Khosla Ventures | 2 |
+| ... | ... | ... |
+
 ## Top valued industries:
 
 Identified industries with the highest company valuations.
@@ -174,6 +222,24 @@ SELECT
 FROM dataset
 GROUP BY industry;
 ```
+
+| # | industry | total_valuation |
+|---|----------|-----------------|
+| 1 | Artificial intelligence | 376999997440 |
+| 2 | Other | 251999997952 |
+| 3 | E-commerce & direct-to-consumer | 425999997952 |
+| 4 | Fintech | 882000002048 |
+| 5 | Internet software & services | 594999998464 |
+| 6 | Supply chain, logistics, & delivery | 176999998976 |
+| 7 | Consumer & retail | 106000002048 |
+| 8 | Data management & analytics | 136000001536 |
+| 9 | Edtech | 100000000512 |
+| 10 | Health | 197999999488 |
+| 11 | Hardware | 990000000512 |
+| 12 | Auto & transportation | 990000000512 |
+| 13 | Travel | 459999999488 |
+| 14 | Cybersecurity | 128999998976 |
+| 15 | Mobile & telecommunications | 885999994489 |
 
 # Phase 3: Statistical Discovery & Advanced EDA (R)
 
