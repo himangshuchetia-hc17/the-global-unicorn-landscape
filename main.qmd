@@ -107,33 +107,31 @@ Created a dataset (geocoded_unicorns.csv) cntaining the Latitude and Longitude o
 Performed the following SQL query to filter the companies that reached Unicorn status within 5 years:
 
 ```sql
-SELECT company, years_to_unicorn
-FROM (
-	SELECT
-        company,
-        YEAR(date_joined) - YEAR(year_founded) AS years_to_unicorn
-	FROM dataset
-	GROUP BY company, years_to_unicorn
-    ) AS yu
-WHERE years_to_unicorn <= 5
-ORDER BY years_to_unicorn;
+SELECT
+    company,
+    industry,
+    country,
+    DATEDIFF(date_joined, year_founded)/365 AS exact_years_to_unicorn
+FROM dataset
+WHERE DATEDIFF(date_joined, year_founded)/365 <= 5
+ORDER BY exact_years_to_unicorn ASC;
 ```
 
-| # | company | years_to_unicorn |
-|---|---------|------------------|
-| 1 | Ola Electric Mobility | 0 |
-| 2 | Flink Food | 0 |
-| 3 | candy.com | 0 |
-| 4 | Avant | 0 |
-| 5 | ClickHouse | 0 |
-| 6 | Jokr | 0 |
-| 7 | GlobalBees | 0 |
-| 8 | Mensa Brands | 0 |
-| 9 | Playco | 0 |
-| 10 | Devoted Health | 1 |
-| 11 | Brex | 1 |
-| 12 | Chiehaduo | 1 |
-| ... | ... | ... |
+| # | company | industry | country | exact_years_to_unicorn |
+|---|---------|----------|---------|------------------------|
+| 1 | Ola Electric Mobility | Auto & transportation | India | 0.4986 |
+| 2 | Playco | Other | Japan | 0.7233 |
+| 3 | candy.com | Fintech | United States | 0.8027 |
+| 4 | ClickHouse | Data management & analytics | United States | 0.8219 |
+| 5 | Mensa Brands | Other | India | 0.8740 |
+| 6 | Flink Food | E-commerce & direct-to-consumer | Germany | 0.9151 |
+| 7 | Jokr | E-commerce & direct-to-consumer | United States | 0.9178 |
+| 8 | Avant | Artificial intelligence | United States | 0.9616 |
+| 9 | GlobalBees | E-commerce & direct-to-consumer | India | 0.9890 |
+| 10 | EQRx | Health | United States | 1.0301 |
+| 11 | Apus Group | Mobile & telecommunications | China | 1.0411 |
+| 12 | Clubhouse | Mobile & telecommunications | United States | 1.0658 |
+| ... | ... | ... | ... | ... |
 
 ## Geographic Grouping:
 
@@ -246,7 +244,7 @@ GROUP BY industry;
 *Goal: Use R to uncover statistical relationships, validate assumptions, and extract non-obvious structure from the global unicorn dataset through rigorous exploratory and inferential analysis.*
 
 
-## Preaparation
+## Preparation
 
 Load the necessary libraries, a function to format large numbers, set the working directory, load the datasets,calculate time to unicorn status and check the quality of the data.
 
@@ -553,12 +551,12 @@ ggplot(data, aes(x = funding, y = years_to_unicorn)) +
         title = "Total Funding vs. Years to Unicorn",
         x = "Total Funding (USD)",
         y = "Years to Unicorn",
-        caption = "Note: Log scale with LOESS trend"
+        caption = "Note: Log scale with LM trend"
     ) +
     theme_minimal()
 ```
 
-### Valuation vs Tine to Unicorn
+### Valuation vs Time to Unicorn
 
 ```{r valuation-vs-time-to-unicorn, message = FALSE, warning = FALSE}
 ggplot(data, aes(x = years_to_unicorn, y = valuation, color = continent)) +
