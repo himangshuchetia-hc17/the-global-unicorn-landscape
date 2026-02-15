@@ -188,7 +188,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10187,Mirakl,4000000000,2011-01-01,2020-09-22,E-commerce & direct-to-consumer,Paris,France,Europe,948000000,"Elaia Partners, 83North, Felix Capital",9,48.8534951,2.3483915
 10188,Rec Room,4000000000,2016-01-01,2021-03-23,Internet software & services,Seattle,United States,North America,294000000,"First Round Capital, Sequoia Capital, Index Ventures",5,47.6038321,-122.330062
 10189,Tekion,4000000000,2016-01-01,2020-10-21,Internet software & services,San Ramon,United States,North America,435000000,"Airbus Ventures, Index Ventures, Advent International",4,37.7648021,-121.9544387
-10190,Otto Bock HealthCare,4000000000,1919-01-01,2017-06-24,Health,Duderstadt,Germany,Europe,NA,EQT Partners,98,51.5123672,10.2610699
+10190,Otto Bock HealthCare,4000000000,1919-01-01,2017-06-24,Health,Duderstadt,Germany,Europe,,EQT Partners,98,51.5123672,10.2610699
 10191,Outreach,4000000000,2011-01-01,2019-04-16,Internet software & services,Seattle,United States,North America,489000000,"Mayfield Fund, M12, Trinity Ventures",8,47.6038321,-122.330062
 10192,WeRide,4000000000,2017-01-01,2020-12-23,Auto & transportation,Guangzhou,China,Asia,1000000000,"Atop Capital, IDInvest Partners, Qiming Venture Partners",3,23.1288454,113.2590064
 10193,Applied Intuition,4000000000,2017-01-01,2020-10-22,Data management & analytics,Sunnyvale,United States,North America,352000000,"Andreessen Horowitz, Lux Capital, General Catalyst",3,37.3688301,-122.036349
@@ -212,9 +212,9 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10211,Globalization Partners,4000000000,2012-01-01,2022-01-24,Internet software & services,Boston,United States,North America,350000000,"Vista Equity Partners, Wincove, TDR Capital",10,42.3588336,-71.0578303
 10212,Intarcia Therapeutics,4000000000,1995-01-01,2014-04-01,Health,Boston,United States,North America,1000000000,"New Enterprise Associates, New Leaf Venture Partners, Charter Venture Capital",19,42.3588336,-71.0578303
 10213,Relativity Space,4000000000,2016-01-01,2020-11-23,Other,Inglewood,United States,North America,1000000000,"Playground Global, Bond, Tribe Capital",4,33.9562003,-118.353132
-10214,StockX,4000000000,2016-01-01,2019-06-26,E-commerce & direct-to-consumer,Detroit,United States,North America,495000000,"Google Ventures, Battery Ventures, DST Global",3,42.3315509,-83.046640300000007
+10214,StockX,4000000000,2016-01-01,2019-06-26,E-commerce & direct-to-consumer,Detroit,United States,North America,495000000,"Google Ventures, Battery Ventures, DST Global",3,42.3315509,-83.0466403
 10215,ThoughtSpot,4000000000,2012-01-01,2018-05-08,Internet software & services,Sunnyvale,United States,North America,664000000,"Lightspeed Venture Partners, Khosla Ventures, Geodesic Capital",6,37.3688301,-122.036349
-10216,SSENSE,4000000000,2003-01-01,2021-06-08,E-commerce & direct-to-consumer,Montreal,Canada,North America,NA,Sequoia Capital,18,45.5031824,-73.5698065
+10216,SSENSE,4000000000,2003-01-01,2021-06-08,E-commerce & direct-to-consumer,Montreal,Canada,North America,,Sequoia Capital,18,45.5031824,-73.5698065
 10217,BitPanda,4000000000,2014-01-01,2021-03-16,Fintech,Vienna,Austria,Europe,546000000,"Speedinvest, Valar Ventures, Uniqa Ventures",7,48.2083537,16.3725042
 10218,Dataminr,4000000000,2009-01-01,2018-06-04,Artificial intelligence,New York,United States,North America,1000000000,"Venrock, Institutional Venture Partners, Goldman Sachs",9,40.7127281,-74.0060152
 10219,Weee!,4000000000,2015-01-01,2021-03-16,"Supply chain, logistics, & delivery",Fremont,United States,North America,864000000,"Goodwater Capital, iFly, XVC Venture Capital",6,37.5482697,-121.988571
@@ -423,7 +423,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10422,Strava,2000000000,2009-01-01,2020-11-16,Internet software & services,San Francisco,United States,North America,152000000,"Jackson Square Ventures, Madrone Capital Partners, Sequoia Capital",11,37.7879363,-122.4075201
 10423,Temporal,2000000000,2019-01-01,2022-02-16,Internet software & services,Bellevue,United States,North America,129000000,"Amplify Partners, Addition, Madrona Venture Group",3,47.6144219,-122.192337
 10424,TuJia,2000000000,2011-01-01,2015-06-17,Travel,Beijing,China,Asia,755000000,"GGV Capital, QiMing Venture Partnersl",4,40.190632,116.412144
-10425,Uplight,2000000000,2019-01-01,2021-03-03,Other,Boulder,United States,North America,NA,"Rubicon Technology Partners, Max Ventures, Inclusive Capital Partners",2,40.0149856,-105.270545
+10425,Uplight,2000000000,2019-01-01,2021-03-03,Other,Boulder,United States,North America,,"Rubicon Technology Partners, Max Ventures, Inclusive Capital Partners",2,40.0149856,-105.270545
 10426,Veho,2000000000,2016-01-01,2021-12-21,"Supply chain, logistics, & delivery",Boulder,United States,North America,299000000,"General Catalyst, Origin Ventures, Fontinalis Partners",5,40.0149856,-105.270545
 10427,Veriff,2000000000,2015-01-01,2022-01-26,Artificial intelligence,Tallinn,Estonia,Europe,177000000,"Accel, Institutional Venture Partners, Tiger Global Management",7,59.4372419,24.7572802
 10428,Whatnot,2000000000,2019-01-01,2021-09-16,E-commerce & direct-to-consumer,Marina del Rey,United States,North America,225000000,"Y Combinator, Andreessen Horowitz, Wonder Ventures",2,33.9776848,-118.448647
@@ -566,7 +566,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10565,Guoquan Shihui,2000000000,2017-01-01,2021-03-17,Consumer & retail,Shanghai,China,Asia,523000000,"Tiantu Capital, CMB International Capital, Vision Knight Capital",4,31.2312707,121.4700152
 10566,Hive,2000000000,2013-01-01,2021-04-21,Artificial intelligence,San Francisco,United States,North America,121000000,"Tomales Bay Capital, Bain & Company, General Catalyst",8,37.7879363,-122.4075201
 10567,HuiMin,2000000000,2013-01-01,2016-09-05,E-commerce & direct-to-consumer,Beijing,China,Asia,517000000,"Zheshang Venture Capital, GP Capital, Western Capital Management",3,40.190632,116.412144
-10568,ISN,2000000000,2001-01-01,2020-12-17,"Supply chain, logistics, & delivery",Dallas,United States,North America,NA,Blackstone,19,32.7762719,-96.7968559
+10568,ISN,2000000000,2001-01-01,2020-12-17,"Supply chain, logistics, & delivery",Dallas,United States,North America,,Blackstone,19,32.7762719,-96.7968559
 10569,Iterable,2000000000,2013-01-01,2021-06-15,Internet software & services,San Francisco,United States,North America,342000000,"CRV, Blue Cloud Ventures, Index Ventures",8,37.7879363,-122.4075201
 10570,Kajabi,2000000000,2010-01-01,2021-05-04,Internet software & services,Irvine,United States,North America,550000000,"Meritech Capital Partners, Tiger Global Management, Spectrum Equity",11,33.6856969,-117.825981
 10571,Kaseya,2000000000,2000-01-01,2019-03-27,Cybersecurity,Miami,United States,North America,545000000,"Insight Partners, TPG Alternative & Renewable Technologies, Ireland Strategic Investment Fund",19,25.7741566,-80.1935973
@@ -638,7 +638,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10637,Rad Power Bikes,1000000000,2007-01-01,2021-10-28,Auto & transportation,Seattle,United States,North America,329000000,"Durable Capital Partners, Cercano Management, T. Rowe Price",14,47.6038321,-122.330062
 10638,Shukun Technology,1000000000,2017-01-01,2021-08-16,Artificial intelligence,Beijing,China,Asia,211000000,"Marathon Venture Partners, Huagai Capital, China Creation Ventures",4,40.190632,116.412144
 10639,Shulan Health,1000000000,2015-01-01,2021-03-01,Health,Hangzhou,China,Asia,43000000,Qiming Venture Partners,6,30.2489634,120.2052342
-10640,SITECH DEV,1000000000,2017-01-01,2019-05-16,Other,Guiyang,China,Asia,NA,China Prosperity Capital,2,26.6499922,106.6246178
+10640,SITECH DEV,1000000000,2017-01-01,2019-05-16,Other,Guiyang,China,Asia,,China Prosperity Capital,2,26.6499922,106.6246178
 10641,Snapdeal,1000000000,2008-01-01,2014-05-21,E-commerce & direct-to-consumer,New Delhi,India,Asia,2000000000,"SoftBankGroup, Blackrock, Alibaba Group",6,28.6138954,77.2090057
 10642,SumUp,1000000000,2011-01-01,2019-07-16,Fintech,London,United Kingdom,Europe,1000000000,"American Express Ventures, Goldman Sachs, Bain Capital Credit",8,51.5074456,-0.1277653
 10643,TalkingData,1000000000,2013-01-01,2021-01-06,Mobile & telecommunications,Beijing,China,Asia,310000000,"N5 Capital, CR Capital Mgmt, JD Digits",8,40.190632,116.412144
@@ -650,7 +650,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10649,Wacai,1000000000,2009-01-01,2018-07-18,Mobile & telecommunications,Hangzhou,China,Asia,369000000,"Qiming Venture Partners, China Broadband Capital, CDH Investments",9,30.2489634,120.2052342
 10650,WeBull,1000000000,2016-01-01,2021-02-18,Fintech,Changsha,China,Asia,230000000,"Bojiang Capital, Hongdao Capital, Mobai Capital",5,28.1987538,112.9708685
 10651,WTOIP,1000000000,2013-01-01,2018-04-08,Internet software & services,Guangzhou,China,Asia,307000000,"Dark Horse Technology Group, Hopu Investment Management, Kefa Capital",5,23.1288454,113.2590064
-10652,Xiaobing,1000000000,2020-01-01,2021-07-12,Fintech,Beijing,China,Asia,NA,"NetEase Capital, Northern Light Venture Capital, Microsoft",1,40.190632,116.412144
+10652,Xiaobing,1000000000,2020-01-01,2021-07-12,Fintech,Beijing,China,Asia,,"NetEase Capital, Northern Light Venture Capital, Microsoft",1,40.190632,116.412144
 10653,Xiaoe Tech,1000000000,2015-01-01,2021-06-15,Internet software & services,Shenzhen,China,Asia,149000000,"GGV Capital, Hillhouse Capital Management, IDG Capital",6,22.5445741,114.0545429
 10654,Yiguo,1000000000,2005-01-01,2016-11-09,"Supply chain, logistics, & delivery",Shanghai,China,Asia,800000000,"Alibaba Group, KKR, Goldman Sachs",11,31.2312707,121.4700152
 10655,Yimidida,1000000000,2015-01-01,2019-01-14,"Supply chain, logistics, & delivery",Shanghai,China,Asia,554000000,"Source Code Capital, Global Logistic Properties, K2VC",4,31.2312707,121.4700152
@@ -716,7 +716,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10715,Yidian Zixun,1000000000,2013-01-01,2017-10-17,Mobile & telecommunications,Beijing,China,Asia,151000000,"Phoenix New Media, Tianjin Haihe Industry Fund",4,40.190632,116.412144
 10716,Yotpo,1000000000,2011-01-01,2021-03-18,Internet software & services,New York,United States,North America,436000000,"Bessemer Venture Partners, Vintage Investment Partners, Blumberg Capital",10,40.7127281,-74.0060152
 10717,Neon,1000000000,2016-01-01,2022-02-14,Fintech,Sao Paulo,Brazil,South America,720000000,"Propel Venture Partners, Monashees+, BBVA",6,-23.5506507,-46.6333824
-10718,Veepee,1000000000,2001-01-01,2007-07-02,E-commerce & direct-to-consumer,La Plaine Saint-Denis,France,Europe,NA,"Summit Partners, Qatar Holding",6,48.9118584,2.3658756
+10718,Veepee,1000000000,2001-01-01,2007-07-02,E-commerce & direct-to-consumer,La Plaine Saint-Denis,France,Europe,,"Summit Partners, Qatar Holding",6,48.9118584,2.3658756
 10719,Alloy,1000000000,2015-01-01,2021-09-30,Fintech,New York,United States,North America,156000000,"Bessemer Venture Partners, Eniac Ventures, Canapi Ventures",6,40.7127281,-74.0060152
 10720,Epirus,1000000000,2018-01-01,2022-02-14,Other,Hawthorne,United States,North America,287000000,"8VC, Bedrock Capital, Broom Ventures",4,33.9128272,-118.3426122
 10721,Klook,1000000000,2014-01-01,2018-08-07,Travel,Central,Hong Kong,Asia,722000000,"Sequoia Capital China, Goldman Sachs, Matrix Partners China",4,14.6446934,121.0504257
@@ -732,7 +732,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10731,Betterment,1000000000,2010-01-01,2021-09-29,Fintech,New York,United States,North America,335000000,"Bessemer Venture Partners, Menlo Ventures, Anthermis",11,40.7127281,-74.0060152
 10732,Cava Group,1000000000,2010-01-01,2021-04-27,Other,Washington,United States,North America,738000000,"SWaN & Legend Ventures, Revolution Growth, Invus Group",11,38.8950368,-77.0365427
 10733,CoinTracker,1000000000,2017-01-01,2022-01-27,Fintech,San Francisco,United States,North America,102000000,"Initialized Capital, General Catalyst, Kraken Ventures",5,37.7879363,-122.4075201
-10734,DistroKid,1000000000,2013-01-01,2021-08-16,Internet software & services,New York,United States,North America,NA,"Insight Partners, Silversmith Capital Partners, Spotify",8,40.7127281,-74.0060152
+10734,DistroKid,1000000000,2013-01-01,2021-08-16,Internet software & services,New York,United States,North America,,"Insight Partners, Silversmith Capital Partners, Spotify",8,40.7127281,-74.0060152
 10735,Domestika,1000000000,2012-01-01,2022-01-27,Internet software & services,Berkeley,United States,North America,130000000,"Zeev Ventures, GSV Ventures",10,37.8708393,-122.272863
 10736,Flock Freight,1000000000,2015-01-01,2021-10-20,"Supply chain, logistics, & delivery",Encinitas,United States,North America,399000000,"SignalFire, GLP Capital Partners, Google Ventures",6,33.0369867,-117.2919818
 10737,InSightec,1000000000,1999-01-01,2020-03-06,Health,Tirat Carmel,Israel,Asia,633000000,"York Capital Management, GE Healthcare, Koch Disruptive Technologies",21,32.7613834,34.9715506
@@ -865,7 +865,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10864,Anyscale,1000000000,2019-01-01,2021-12-07,Artificial intelligence,Berkeley,United States,North America,160000000,"Andreessen Horowitz, Intel Capital, Foundation Capital",2,37.8708393,-122.272863
 10865,Aptos,1000000000,2021-01-01,2022-03-15,Internet software & services,Palo Alto,United States,North America,200000000,"Andreessen Horowitz, Coinbase Ventures, Tiger Global Management",1,37.4443293,-122.1598465
 10866,Aqua Security,1000000000,2015-01-01,2021-03-10,Cybersecurity,Ramat Gan,Israel,Asia,265000000,"TLV Partners, Lightspeed Venture Partners, M12",6,32.0686867,34.8246812
-10867,Assembly,1000000000,2019-01-01,2021-09-21,Internet software & services,Culver City,United States,North America,NA,"Advent International, PSG, Providence Equity Partners",2,34.0211224,-118.396466
+10867,Assembly,1000000000,2019-01-01,2021-09-21,Internet software & services,Culver City,United States,North America,,"Advent International, PSG, Providence Equity Partners",2,34.0211224,-118.396466
 10868,Assent,1000000000,2010-01-01,2022-01-06,"Supply chain, logistics, & delivery",Ottawa,Canada,North America,534000000,"Vista Equity Partners, Warburg Pincus, First Ascent Ventures",12,45.4208777,-75.6901106
 10869,Augury,1000000000,2011-01-01,2021-10-26,Artificial intelligence,New York,United States,North America,294000000,"Lerer Hippeau, Munich Re Ventures, Eclipse Ventures",10,40.7127281,-74.0060152
 10870,Axelar,1000000000,2020-01-01,2022-02-15,Internet software & services,Waterloo,Canada,North America,64000000,"Lemniscap VC, North Island Ventures, Polychain Capital",2,42.498275,-92.3328743
@@ -889,7 +889,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10888,Capsule,1000000000,2016-01-01,2021-04-28,Health,New York,United States,North America,570000000,"Thrive Capital, Durable Capital Partners, G Squared",5,40.7127281,-74.0060152
 10889,CargoX,1000000000,2015-01-01,2021-10-21,"Supply chain, logistics, & delivery",Sao Paulo,Brazil,South America,390000000,"Valor Capital Group, Lightrock, Softbank Group",6,-23.5506507,-46.6333824
 10890,Carro,1000000000,2015-01-01,2021-06-14,E-commerce & direct-to-consumer,Singapore,Singapore,Asia,595000000,"SingTel Innov8, Alpha JWC Ventures, Golden Gate Ventures",6,1.357107,103.8194992
-10891,Carson Group,1000000000,2012-01-01,2021-07-14,Fintech,Lincoln,United States,North America,NA,Bain Capital,9,40.8088861,-96.7077751
+10891,Carson Group,1000000000,2012-01-01,2021-07-14,Fintech,Lincoln,United States,North America,,Bain Capital,9,40.8088861,-96.7077751
 10892,CHEQ,1000000000,2014-01-01,2022-02-22,Cybersecurity,New York,United States,North America,182000000,"Battery Ventures, Tiger Global Management, Hanaco Ventures",8,40.7127281,-74.0060152
 10893,Chronosphere,1000000000,2019-01-01,2021-10-07,Data management & analytics,New York,United States,North America,254000000,"Greylock Partners, Lux Capital, General Atlantic",2,40.7127281,-74.0060152
 10894,Cider,1000000000,2020-01-01,2021-09-02,E-commerce & direct-to-consumer,Hong Kong,Hong Kong,Asia,140000000,"Andreessen Horowitz, DST Global, IDG Capital",1,22.3492155,114.1857978
@@ -944,9 +944,9 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 10943,Injective Protocol,1000000000,2018-01-01,2021-04-20,Fintech,New York,United States,North America,17000000,"Pantera Capital, Cadenza Ventures, BlockTower Capital",3,40.7127281,-74.0060152
 10944,Intellifusion,1000000000,2014-01-01,2019-03-22,Artificial intelligence,Shenzhen,China,Asia,173000000,"BOC International, TopoScend Capital, Hongxiu VC",5,22.5445741,114.0545429
 10945,Interos,1000000000,2005-01-01,2021-07-22,Fintech,Arlington,United States,North America,135000000,"Kleiner Perkins Caufield & Byers, NightDragon Security, Venrock",16,32.7355816,-97.1071186
-10946,Iodine Software,1000000000,2010-01-01,2021-12-01,Data management & analytics,Austin,United States,North America,NA,"Advent International, Bain Capital Ventures, Silversmith Capital Partners",11,30.2711286,-97.7436995
+10946,Iodine Software,1000000000,2010-01-01,2021-12-01,Data management & analytics,Austin,United States,North America,,"Advent International, Bain Capital Ventures, Silversmith Capital Partners",11,30.2711286,-97.7436995
 10947,JoyTunes,1000000000,2011-01-01,2021-06-21,Edtech,Tel Aviv,Israel,Asia,92000000,"Genesis Partners, Aleph, Insight Partners",10,32.0852997,34.7818064
-10948,Kendra Scott,1000000000,2002-01-01,2016-12-21,Consumer & retail,Austin,United States,North America,NA,"Berkshire Partners, Norwest Venture Partners",14,30.2711286,-97.7436995
+10948,Kendra Scott,1000000000,2002-01-01,2016-12-21,Consumer & retail,Austin,United States,North America,,"Berkshire Partners, Norwest Venture Partners",14,30.2711286,-97.7436995
 10949,Kitopi,1000000000,2018-01-01,2021-07-01,"Supply chain, logistics, & delivery",Dubai,United Arab Emirates,Asia,504000000,"CE-Ventures, BECO Capital, Nordstar",3,25.0742823,55.1885387
 10950,KnowBox,1000000000,2014-01-01,2019-05-30,Edtech,Beijing,China,Asia,306000000,"TAL Education Group, Legend Star, Alibaba Group",5,40.190632,116.412144
 10951,Kopi Kenangan,1000000000,2017-01-01,2021-12-27,Consumer & retail,Jakarta,Indonesia,Asia,333000000,"Horizons Ventures, Sequoia Capital India, Alpha JWC Ventures",4,-6.1754049,106.827168
@@ -1001,7 +1001,7 @@ company_id,company,valuation,year_founded,date_joined,industry,city,country,cont
 11000,PLACE,1000000000,2020-01-01,2021-11-17,Internet software & services,Bellingham,United States,North America,100000000,"Goldman Sachs Asset Management, 3L",1,48.7544012,-122.478836
 11001,Placer.ai,1000000000,2016-01-01,2022-01-12,Artificial intelligence,Los Altos,United States,North America,166000000,"Fifth Wall Ventures, JBV Capital, Array Ventures",6,42.7811566,-3.6202096
 11002,Playco,1000000000,2020-01-01,2020-09-21,Other,Tokyo,Japan,Asia,140000000,"Sozo Ventures, Caffeinated Capital, Sequoia Capital",0,35.6768601,139.7638947
-11003,Poizon,1000000000,2015-01-01,2019-04-29,Mobile & telecommunications,Shanghai,China,Asia,NA,"DST Global, Sequoia Capital China, Gaorong Capital",4,31.2312707,121.4700152
+11003,Poizon,1000000000,2015-01-01,2019-04-29,Mobile & telecommunications,Shanghai,China,Asia,,"DST Global, Sequoia Capital China, Gaorong Capital",4,31.2312707,121.4700152
 11004,PPRO,1000000000,2006-01-01,2021-01-19,Fintech,London,United Kingdom,Europe,370000000,"Wellington Management, Eurazeo, Citi Ventures",15,51.5074456,-0.1277653
 11005,Printful,1000000000,2016-01-01,2021-05-24,Other,Charlotte,United States,North America,130000000,Bregal Sagemount,5,35.2272086,-80.8430827
 11006,Quantum Metric,1000000000,2015-01-01,2021-01-07,Data management & analytics,Colorado Springs,United States,North America,226000000,"Insight Partners, Bain Capital Ventures",6,38.8339578,-104.825348
