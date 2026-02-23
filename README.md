@@ -4,7 +4,7 @@ Funding, Valuation, and Growth Dynamics of Billion-Dollar Startups
 
 ## Overview
 
-This project analyzes global unicorn companies (privately valued startups worth $1B+) to identify "efficient" unicorns—those reaching $1 billion valuation in less than 5 years. The analysis uncovers underserved, high-growth markets for venture capital investment.
+This project analyzes global unicorn companies (privately valued startups worth $1B+) to identify "efficient" unicorns, which have reached $1B+ valuation in less than 5 years. The analysis uncovers underserved, high-growth markets for venture capital investment.
 
 ## Key Insights
 
