@@ -13,7 +13,7 @@ This project analyzes global unicorn companies (privately valued startups worth 
 - **Geographic opportunity exists:** China dominates AI valuation ($214B vs. US $135B), while India and Southeast Asia offer lower competition with similar growth timelines.
 - **Investor concentration:** A "super-cluster" of co-investors (Tiger Global, SoftBank, Sequoia China, Tencent) controls high-valuation outcomes.
 
-For the full technical analysis and methodology, see the [Quarto report](main.html).
+For the full technical analysis and methodology, see the [Quarto report](https://himangshuchetia-hc17.github.io/the-global-unicorn-landscape/main.html).
 
 ## Project Files
 
