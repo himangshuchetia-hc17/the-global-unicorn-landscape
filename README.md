@@ -33,7 +33,7 @@ View the interactive dashboard on [Tableau Public](https://public.tableau.com/vi
 
 - Excel
 - SQL
-- R (tidyverse, ggplot2, igraph)
+- R
 - Quarto
 - Tableau
 
@@ -42,8 +42,7 @@ View the interactive dashboard on [Tableau Public](https://public.tableau.com/vi
 1. Clone this repository
 2. Install R and required packages:
    ```r
-   install.packages(c("tidyverse", "scales", "knitr", "viridis",
-                      "maps", "treemapify", "ggraph", "igraph", "networkD3"))
+   install.packages(c("tidyverse", "scales", "knitr", "viridis", "maps", "treemapify", "ggraph", "igraph", "networkD3"))
    ```
 3. Render the Quarto report:
    ```bash
@@ -51,10 +50,11 @@ View the interactive dashboard on [Tableau Public](https://public.tableau.com/vi
    ```
 
 ## Data Source
-
-- **Dataset:** Unicorn Companies Global Valuations
-- **Platform:** Kaggle
-- **Author:** Adil Shamim
+* **Dataset:** Unicorn Companies Global Valuations
+* **Platform:** Kaggle
+* **Author:** Adil Shamim
+* **Description:** This dataset provides a comprehensive list of "Unicorn" companies (private companies valued at over $1 billion). It includes key metrics such as current valuation, total funding raised, industry sector, headquarters location (City, Country, Continent), the year the company was founded, and the names of primary investors.
+* **Citation:** Shamim, A. (2024). Startup growth and investment data [Data set]. Kaggle. https://www.kaggle.com/datasets/adilshamim8/startup-growth-and-investment-data
 
 ## Limitations
 
