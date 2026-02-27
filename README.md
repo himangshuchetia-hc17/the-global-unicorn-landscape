@@ -15,6 +15,10 @@ This project analyzes global unicorn companies (privately valued startups worth 
 
 For the full technical analysis and methodology, see the [Quarto report](https://himangshuchetia-hc17.github.io/the-global-unicorn-landscape/main.html).
 
+## Dashboard
+
+View the interactive dashboard on [Tableau Public](https://public.tableau.com/views/TheGlobalUnicornLandscape/Dashboard?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link).
+
 ## Project Files
 
 | File | Description |
