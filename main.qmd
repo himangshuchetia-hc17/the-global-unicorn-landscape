@@ -2,7 +2,6 @@
 title: "The Global Unicorn Landscape"
 subtitle: "Funding, Valuation, and Growth Dynamics of Billion-Dollar Startups"
 author: "Himangshu Chetia"
-date: "2026-01-16"
 format:
   html:
     toc: true
