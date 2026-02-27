@@ -1,5 +1,5 @@
 ---
-title: "Chasing Billions: The Global Unicorn Landscape"
+title: "The Global Unicorn Landscape"
 subtitle: "Funding, Valuation, and Growth Dynamics of Billion-Dollar Startups"
 author: "Himangshu Chetia"
 date: "2026-01-16"
@@ -429,6 +429,15 @@ ggplot(data %>% filter(efficiency_ratio < 100), aes(x = efficiency_ratio)) +
         xintercept = median_efficiency,
         linetype = "dashed",
         color = "red"
+    ) +
+    annotate(
+        "text",
+        x = 4,
+        y = 70,
+        label = "Median",
+        colour = "#D55E00",
+        size = 3.5,
+        fontface = "bold"
     ) +
     scale_x_log10(labels = label_comma()) +
     labs(

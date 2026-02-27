@@ -1,4 +1,4 @@
-# Chasing Billions: The Global Unicorn Landscape
+# The Global Unicorn Landscape
 
 Funding, Valuation, and Growth Dynamics of Billion-Dollar Startups
 
@@ -21,13 +21,13 @@ View the interactive dashboard on [Tableau Public](https://public.tableau.com/vi
 
 ## Project Files
 
-| File | Description |
-|------|-------------|
-| `main.qmd` | Quarto source for the technical report |
-| `main.html` | Rendered interactive report |
-| `dataset.csv` | Original unicorn company data |
-| `dataset_long.csv` | Investor-normalized format (one row per investor) |
-| `geocoded_unicorns.csv` | Data with latitude/longitude coordinates |
+| File                    | Description                                       |
+| ----------------------- | ------------------------------------------------- |
+| `main.qmd`              | Quarto source for the technical report            |
+| `main.html`             | Rendered interactive report                       |
+| `dataset.csv`           | Original unicorn company data                     |
+| `dataset_long.csv`      | Investor-normalized format (one row per investor) |
+| `geocoded_unicorns.csv` | Data with latitude/longitude coordinates          |
 
 ## Tech Stack
 
@@ -42,7 +42,7 @@ View the interactive dashboard on [Tableau Public](https://public.tableau.com/vi
 1. Clone this repository
 2. Install R and required packages:
    ```r
-   install.packages(c("tidyverse", "scales", "knitr", "viridis", 
+   install.packages(c("tidyverse", "scales", "knitr", "viridis",
                       "maps", "treemapify", "ggraph", "igraph", "networkD3"))
    ```
 3. Render the Quarto report:
